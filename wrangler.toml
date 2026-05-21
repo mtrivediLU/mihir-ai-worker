@@ -1,0 +1,23 @@
+name = "mihir-ai-worker"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "development"
+VERSION = "0.1.0"
+
+# Cloudflare KV binding (add namespace ID once created)
+# [[kv_namespaces]]
+# binding = "KV"
+# id = "YOUR_KV_NAMESPACE_ID"
+
+# Cloudflare D1 binding (add database ID once created)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "mihir-ai-portfolio"
+# database_id = "YOUR_D1_DATABASE_ID"
+
+# Secrets to bind at runtime (set via `wrangler secret put`):
+#   RESEND_API_KEY
+#   TURNSTILE_SECRET_KEY
