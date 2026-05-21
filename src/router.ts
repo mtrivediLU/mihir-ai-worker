@@ -1,5 +1,6 @@
 import type { Env } from "./types";
 import { handleHealth } from "./routes/health";
+import { handleDebugProfile } from "./routes/debug";
 
 export async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
@@ -8,6 +9,10 @@ export async function route(request: Request, env: Env): Promise<Response> {
 
   if (pathname === "/health" && method === "GET") {
     return handleHealth(request, env);
+  }
+
+  if (pathname === "/debug/profile" && method === "GET") {
+    return handleDebugProfile(request, env);
   }
 
   return Response.json({ error: "Not found" }, { status: 404 });

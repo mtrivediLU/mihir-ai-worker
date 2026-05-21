@@ -2,12 +2,17 @@ export interface Env {
   // Wrangler vars
   ENVIRONMENT: string;
   VERSION: string;
+  ENV: string;
 
-  // Bindings (uncomment as they are added)
+  // D1 database binding (activated in wrangler.toml)
+  DB: D1Database;
+
+  // KV namespace (activate when ready)
   // KV: KVNamespace;
-  // DB: D1Database;
 
   // Secrets (set via `wrangler secret put`)
   // RESEND_API_KEY: string;
   // TURNSTILE_SECRET_KEY: string;
+  SESSION_HMAC_KEY?: string;
+  IP_HASH_SALT?: string;
 }
