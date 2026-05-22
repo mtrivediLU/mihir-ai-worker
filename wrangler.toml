@@ -15,6 +15,10 @@ binding = "DB"
 database_name = "mihir_ai"
 database_id = "06c57d13-f79e-4d3a-b7df-54b7ef9e7aa1"
 
+# Cloudflare Workers AI binding
+[ai]
+binding = "AI"
+
 # Cloudflare KV binding (activate when KV namespace is ready)
 # [[kv_namespaces]]
 # binding = "KV"

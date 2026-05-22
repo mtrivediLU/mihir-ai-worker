@@ -4,8 +4,11 @@ export interface Env {
   VERSION: string;
   ENV: string;
 
-  // D1 database binding (activated in wrangler.toml)
+  // D1 database binding
   DB: D1Database;
+
+  // Workers AI binding
+  AI: Ai;
 
   // KV namespace (activate when ready)
   // KV: KVNamespace;

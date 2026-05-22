@@ -1,67 +1,11 @@
 import type { Env } from "../types";
 import { verifyHmac } from "../lib/crypto";
-import { getSession, insertMessage, touchSession } from "../lib/d1";
+import type { Message } from "../lib/d1";
+import { getSession, getSessionMessages, insertMessage, touchSession } from "../lib/d1";
 import { INJECTION_PATTERNS, REFUSAL_RESPONSE } from "../lib/prompts";
-import { PROFILE } from "../lib/profile";
+import { getAiReply } from "../lib/ai";
 
-// ─── Mock response ─────────────────────────────────────────────────────────────
-// Replaced by real AI in Phase 3B2. Uses profile data so responses are useful
-// even in mock mode.
-
-function buildMockReply(message: string): string {
-  const q = message.toLowerCase();
-
-  if (/availab|open to|looking|hire|opportun|interview/.test(q)) {
-    return (
-      `${PROFILE.availability} ` +
-      `You can reach Mihir directly at ${PROFILE.contact.email}.`
-    );
-  }
-
-  if (/skill|tech|stack|language|tool|know/.test(q)) {
-    const top = PROFILE.skills.slice(0, 8).join(", ");
-    return (
-      `Mihir's core technical skills include ${top}, and more. ` +
-      `He has deep experience in both data engineering and full-stack development.`
-    );
-  }
-
-  if (/experienc|work|career|background|role|job/.test(q)) {
-    const latest = PROFILE.experience[0];
-    return (
-      `Mihir's most recent role is ${latest.role} at ${latest.company} ` +
-      `(${latest.period}). ${PROFILE.summary}`
-    );
-  }
-
-  if (/certif|credential|microsoft|salesforce|azure/.test(q)) {
-    const names = PROFILE.certifications.map((c) => c.name).join("; ");
-    return `Mihir holds ${PROFILE.certifications.length} active certifications: ${names}.`;
-  }
-
-  if (/educat|degree|school|universit|master|bachelor/.test(q)) {
-    const edu = PROFILE.education
-      .map((e) => `${e.degree} from ${e.institution} (${e.years})`)
-      .join(", and ");
-    return `Mihir's academic background: ${edu}.`;
-  }
-
-  if (/contact|email|reach|connect/.test(q)) {
-    return (
-      `You can reach Mihir at ${PROFILE.contact.email} ` +
-      `or connect on LinkedIn: ${PROFILE.contact.linkedin}.`
-    );
-  }
-
-  // Default
-  return (
-    `Hi! I'm Mihir's AI assistant. ${PROFILE.summary} ` +
-    `He's ${PROFILE.availability.toLowerCase()} ` +
-    `Feel free to ask about his experience, skills, or certifications!`
-  );
-}
-
-// ─── Helper: store a message pair and touch the session ────────────────────────
+// ─── Helper: persist a user+assistant turn and update the session ──────────────
 
 async function persistTurn(
   env: Env,
@@ -69,6 +13,7 @@ async function persistTurn(
   userContent: string,
   assistantContent: string,
   assistantModel: string,
+  latencyMs: number | null,
 ): Promise<void> {
   await insertMessage(env, {
     session_id: sessionId,
@@ -88,7 +33,7 @@ async function persistTurn(
     tokens_in: null,
     tokens_out: null,
     model: assistantModel,
-    latency_ms: null,
+    latency_ms: latencyMs,
     feedback: null,
   });
 
@@ -176,29 +121,65 @@ export async function handleChat(
     return Response.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
 
-  // 5. Detect prompt injection — store both messages but return the refusal
+  // 5. Detect prompt injection — log the attempt then return the refusal.
+  //    Do NOT call AI for injected input.
   const isInjection = INJECTION_PATTERNS.some((pattern) =>
     pattern.test(trimmedMessage),
   );
 
   if (isInjection) {
     try {
-      await persistTurn(env, session.id, trimmedMessage, REFUSAL_RESPONSE, "refusal");
+      await persistTurn(
+        env,
+        session.id,
+        trimmedMessage,
+        REFUSAL_RESPONSE,
+        "refusal",
+        null,
+      );
     } catch (err) {
       console.error("persistTurn (injection) failed:", err);
     }
     return Response.json({ reply: REFUSAL_RESPONSE, session_id: session.id });
   }
 
-  // 6. Build mock reply, persist turn, respond
-  const reply = buildMockReply(trimmedMessage);
-
+  // 6. Fetch recent conversation history for context, then call Workers AI
+  let history: Message[];
   try {
-    await persistTurn(env, session.id, trimmedMessage, reply, "mock");
+    history = await getSessionMessages(env, session.id, 6);
+  } catch (err) {
+    console.error("getSessionMessages failed:", err);
+    history = []; // non-fatal — proceed without history
+  }
+
+  let aiResult;
+  try {
+    aiResult = await getAiReply(env, trimmedMessage, history);
+  } catch (err) {
+    console.error("Workers AI failed:", err);
+    // Graceful fallback: store and return a safe message rather than a 500.
+    aiResult = {
+      reply:
+        "I'm having trouble responding right now. Please try again in a moment.",
+      model: "fallback",
+      latency_ms: 0,
+    };
+  }
+
+  // 7. Persist turn and respond
+  try {
+    await persistTurn(
+      env,
+      session.id,
+      trimmedMessage,
+      aiResult.reply,
+      aiResult.model,
+      aiResult.latency_ms,
+    );
   } catch (err) {
     console.error("persistTurn failed:", err);
     return Response.json({ error: "Failed to save message" }, { status: 500 });
   }
 
-  return Response.json({ reply, session_id: session.id });
+  return Response.json({ reply: aiResult.reply, session_id: session.id });
 }

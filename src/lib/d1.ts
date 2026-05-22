@@ -175,10 +175,14 @@ export async function getSessionMessages(
   sessionId: string,
   limit = 50,
 ): Promise<Message[]> {
+  // Inner query fetches the last `limit` rows descending; outer re-sorts ascending
+  // so callers always receive messages in chronological order.
   const result = await env.DB.prepare(
-    `SELECT id, session_id, role, content, created_at,
-            tokens_in, tokens_out, model, latency_ms, feedback
-     FROM messages WHERE session_id = ? ORDER BY created_at ASC LIMIT ?`,
+    `SELECT * FROM (
+       SELECT id, session_id, role, content, created_at,
+              tokens_in, tokens_out, model, latency_ms, feedback
+       FROM messages WHERE session_id = ? ORDER BY created_at DESC LIMIT ?
+     ) ORDER BY created_at ASC`,
   )
     .bind(sessionId, limit)
     .all<Message>();
