@@ -9,8 +9,8 @@
     "lint": "eslint src --ext .ts"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250515.0",
+    "@cloudflare/workers-types": "^4.20260522.1",
     "typescript": "^5.5.4",
-    "wrangler": "^3.114.0"
+    "wrangler": "^4.93.1"
   }
 }
