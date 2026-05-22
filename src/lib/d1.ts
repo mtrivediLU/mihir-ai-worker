@@ -94,17 +94,44 @@ export type LeadInsert = Omit<Lead, "id" | "created_at">;
 // ─── Helper stubs ─────────────────────────────────────────────────────────────
 
 export async function createSession(
-  _env: Env,
-  _session: SessionInsert,
+  env: Env,
+  session: SessionInsert,
 ): Promise<void> {
-  throw new Error("TODO: implement createSession");
+  await env.DB.prepare(
+    `INSERT INTO sessions
+       (id, ip_hash, country, region, city, asn, asn_name,
+        user_agent_family, referrer, landing_path, csrf_secret)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      session.id,
+      session.ip_hash,
+      session.country,
+      session.region,
+      session.city,
+      session.asn,
+      session.asn_name,
+      session.user_agent_family,
+      session.referrer,
+      session.landing_path,
+      session.csrf_secret,
+    )
+    .run();
 }
 
 export async function getSession(
-  _env: Env,
-  _id: string,
+  env: Env,
+  id: string,
 ): Promise<Session | null> {
-  throw new Error("TODO: implement getSession");
+  const row = await env.DB.prepare(
+    `SELECT id, created_at, last_active_at, ip_hash, country, region, city,
+            asn, asn_name, user_agent_family, referrer, landing_path,
+            csrf_secret, message_count, intent, intent_confidence, ended_at
+     FROM sessions WHERE id = ?`,
+  )
+    .bind(id)
+    .first<Session>();
+  return row ?? null;
 }
 
 export async function touchSession(
