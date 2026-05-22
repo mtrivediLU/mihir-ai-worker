@@ -10,6 +10,7 @@ import {
   RL_KEYS,
   tooManyRequests,
 } from "../lib/kv";
+import { verifyTurnstile } from "../lib/turnstile";
 
 // ─── Helper: persist a user+assistant turn and update the session ──────────────
 
@@ -72,7 +73,7 @@ export async function handleChat(
     return Response.json({ error: "Body must be a JSON object" }, { status: 400 });
   }
 
-  const { session_id, csrf_token, message } = body as Record<string, unknown>;
+  const { session_id, csrf_token, message, turnstile_token } = body as Record<string, unknown>;
 
   if (typeof session_id !== "string" || !session_id.trim()) {
     return Response.json({ error: "session_id is required" }, { status: 400 });
@@ -157,7 +158,21 @@ export async function handleChat(
     return tooManyRequests(ipRl.retryAfterSeconds);
   }
 
-  // 8. Detect prompt injection — log the attempt in D1 but do NOT call AI.
+  // 8. Turnstile verification — required once the session reaches the threshold
+  //    where the post-turn message_count would be >= 5 (i.e., the 3rd turn onward).
+  //    Before the threshold, turnstile_token is optional and ignored.
+  const turnstileRequired = (session.message_count + 2) >= 5;
+  if (turnstileRequired) {
+    if (typeof turnstile_token !== "string" || !turnstile_token.trim()) {
+      return Response.json({ error: "Turnstile verification required" }, { status: 403 });
+    }
+    const tsResult = await verifyTurnstile(env, turnstile_token.trim());
+    if (!tsResult.success) {
+      return Response.json({ error: "Turnstile verification failed" }, { status: 403 });
+    }
+  }
+
+  // 9. Detect prompt injection — log the attempt in D1 but do NOT call AI.
   const isInjection = INJECTION_PATTERNS.some((pattern) =>
     pattern.test(trimmedMessage),
   );
@@ -175,15 +190,14 @@ export async function handleChat(
     } catch (err) {
       console.error("persistTurn (injection) failed:", err);
     }
-    const turnstile_required = (session.message_count + 2) >= 5;
     return Response.json({
       reply: REFUSAL_RESPONSE,
       session_id: session.id,
-      turnstile_required,
+      turnstile_required: turnstileRequired,
     });
   }
 
-  // 9. Fetch recent conversation history for AI context
+  // 10. Fetch recent conversation history for AI context
   let history: Message[];
   try {
     history = await getSessionMessages(env, session.id, 6);
@@ -192,7 +206,7 @@ export async function handleChat(
     history = []; // non-fatal — proceed without history
   }
 
-  // 10. Call Workers AI
+  // 11. Call Workers AI
   let aiResult;
   try {
     aiResult = await getAiReply(env, trimmedMessage, history);
@@ -205,7 +219,7 @@ export async function handleChat(
     };
   }
 
-  // 11. Persist the turn to D1
+  // 12. Persist the turn to D1
   try {
     await persistTurn(
       env,
@@ -220,12 +234,11 @@ export async function handleChat(
     return Response.json({ error: "Failed to save message" }, { status: 500 });
   }
 
-  // 12. Respond — include turnstile_required flag.
+  // 13. Respond — include turnstile_required flag.
   //    true once the session has accumulated 5+ messages (post-turn count).
-  const turnstile_required = (session.message_count + 2) >= 5;
   return Response.json({
     reply: aiResult.reply,
     session_id: session.id,
-    turnstile_required,
+    turnstile_required: turnstileRequired,
   });
 }

@@ -6,3 +6,8 @@
 
 SESSION_HMAC_KEY=replace-with-a-long-random-secret
 IP_HASH_SALT=replace-with-a-different-long-random-secret
+
+# Cloudflare Turnstile secret key — get from Cloudflare Dashboard → Turnstile.
+# Leave unset in local dev; the dev bypass token ("dev-turnstile-token") is used
+# when ENV=dev and TURNSTILE_SECRET_KEY is not set.
+# TURNSTILE_SECRET_KEY=your-turnstile-secret-key-here
