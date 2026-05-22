@@ -2,6 +2,7 @@ import type { Env } from "./types";
 import { handleHealth } from "./routes/health";
 import { handleDebugProfile } from "./routes/debug";
 import { handleCreateSession } from "./routes/session";
+import { handleChat } from "./routes/chat";
 
 export async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
@@ -18,6 +19,10 @@ export async function route(request: Request, env: Env): Promise<Response> {
 
   if (pathname === "/api/session" && method === "POST") {
     return handleCreateSession(request, env);
+  }
+
+  if (pathname === "/api/chat" && method === "POST") {
+    return handleChat(request, env);
   }
 
   return Response.json({ error: "Not found" }, { status: 404 });

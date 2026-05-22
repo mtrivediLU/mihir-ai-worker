@@ -135,25 +135,54 @@ export async function getSession(
 }
 
 export async function touchSession(
-  _env: Env,
-  _id: string,
+  env: Env,
+  id: string,
+  messageIncrement = 0,
 ): Promise<void> {
-  throw new Error("TODO: implement touchSession");
+  await env.DB.prepare(
+    `UPDATE sessions
+     SET last_active_at = unixepoch(), message_count = message_count + ?
+     WHERE id = ?`,
+  )
+    .bind(messageIncrement, id)
+    .run();
 }
 
 export async function insertMessage(
-  _env: Env,
-  _message: MessageInsert,
+  env: Env,
+  message: MessageInsert,
 ): Promise<void> {
-  throw new Error("TODO: implement insertMessage");
+  await env.DB.prepare(
+    `INSERT INTO messages
+       (session_id, role, content, tokens_in, tokens_out, model, latency_ms, feedback)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      message.session_id,
+      message.role,
+      message.content,
+      message.tokens_in,
+      message.tokens_out,
+      message.model,
+      message.latency_ms,
+      message.feedback,
+    )
+    .run();
 }
 
 export async function getSessionMessages(
-  _env: Env,
-  _sessionId: string,
-  _limit?: number,
+  env: Env,
+  sessionId: string,
+  limit = 50,
 ): Promise<Message[]> {
-  throw new Error("TODO: implement getSessionMessages");
+  const result = await env.DB.prepare(
+    `SELECT id, session_id, role, content, created_at,
+            tokens_in, tokens_out, model, latency_ms, feedback
+     FROM messages WHERE session_id = ? ORDER BY created_at ASC LIMIT ?`,
+  )
+    .bind(sessionId, limit)
+    .all<Message>();
+  return result.results;
 }
 
 export async function insertLead(
