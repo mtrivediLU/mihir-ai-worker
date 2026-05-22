@@ -4,6 +4,12 @@ import type { Message } from "../lib/d1";
 import { getSession, getSessionMessages, insertMessage, touchSession } from "../lib/d1";
 import { INJECTION_PATTERNS, REFUSAL_RESPONSE } from "../lib/prompts";
 import { getAiReply } from "../lib/ai";
+import {
+  incrementRateLimit,
+  RATE_LIMITS,
+  RL_KEYS,
+  tooManyRequests,
+} from "../lib/kv";
 
 // ─── Helper: persist a user+assistant turn and update the session ──────────────
 
@@ -106,7 +112,7 @@ export async function handleChat(
     return Response.json({ error: "Session has ended" }, { status: 401 });
   }
 
-  // 4. Verify CSRF token
+  // 4. Verify CSRF token — must happen before any state change
   if (!session.csrf_secret) {
     return Response.json({ error: "Invalid session" }, { status: 401 });
   }
@@ -121,8 +127,37 @@ export async function handleChat(
     return Response.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
 
-  // 5. Detect prompt injection — log the attempt then return the refusal.
-  //    Do NOT call AI for injected input.
+  // 5. Session message cap (D1-based; no KV needed).
+  //    Hard limit: 50 stored messages per session (~25 turns).
+  if (session.message_count >= RATE_LIMITS.SESSION_MSG_CAP) {
+    return tooManyRequests(0, "Session message limit reached. Please start a new session.");
+  }
+
+  // 6. Global daily message cap (KV).
+  const globalRl = await incrementRateLimit(
+    env,
+    RL_KEYS.chatGlobal(),
+    RATE_LIMITS.CHAT_GLOBAL.limit,
+    RATE_LIMITS.CHAT_GLOBAL.windowMs,
+  );
+  if (!globalRl.allowed) {
+    return tooManyRequests(globalRl.retryAfterSeconds, "Service is busy. Please try again later.");
+  }
+
+  // 7. Per-IP chat rate limit (KV).
+  //    Use the session's stored ip_hash as client identity; fall back to session_id.
+  const rlId = session.ip_hash ?? session.id;
+  const ipRl = await incrementRateLimit(
+    env,
+    RL_KEYS.chatIp(rlId),
+    RATE_LIMITS.CHAT_PER_IP.limit,
+    RATE_LIMITS.CHAT_PER_IP.windowMs,
+  );
+  if (!ipRl.allowed) {
+    return tooManyRequests(ipRl.retryAfterSeconds);
+  }
+
+  // 8. Detect prompt injection — log the attempt in D1 but do NOT call AI.
   const isInjection = INJECTION_PATTERNS.some((pattern) =>
     pattern.test(trimmedMessage),
   );
@@ -140,10 +175,15 @@ export async function handleChat(
     } catch (err) {
       console.error("persistTurn (injection) failed:", err);
     }
-    return Response.json({ reply: REFUSAL_RESPONSE, session_id: session.id });
+    const turnstile_required = (session.message_count + 2) >= 5;
+    return Response.json({
+      reply: REFUSAL_RESPONSE,
+      session_id: session.id,
+      turnstile_required,
+    });
   }
 
-  // 6. Fetch recent conversation history for context, then call Workers AI
+  // 9. Fetch recent conversation history for AI context
   let history: Message[];
   try {
     history = await getSessionMessages(env, session.id, 6);
@@ -152,21 +192,20 @@ export async function handleChat(
     history = []; // non-fatal — proceed without history
   }
 
+  // 10. Call Workers AI
   let aiResult;
   try {
     aiResult = await getAiReply(env, trimmedMessage, history);
   } catch (err) {
     console.error("Workers AI failed:", err);
-    // Graceful fallback: store and return a safe message rather than a 500.
     aiResult = {
-      reply:
-        "I'm having trouble responding right now. Please try again in a moment.",
+      reply: "I'm having trouble responding right now. Please try again in a moment.",
       model: "fallback",
       latency_ms: 0,
     };
   }
 
-  // 7. Persist turn and respond
+  // 11. Persist the turn to D1
   try {
     await persistTurn(
       env,
@@ -181,5 +220,12 @@ export async function handleChat(
     return Response.json({ error: "Failed to save message" }, { status: 500 });
   }
 
-  return Response.json({ reply: aiResult.reply, session_id: session.id });
+  // 12. Respond — include turnstile_required flag.
+  //    true once the session has accumulated 5+ messages (post-turn count).
+  const turnstile_required = (session.message_count + 2) >= 5;
+  return Response.json({
+    reply: aiResult.reply,
+    session_id: session.id,
+    turnstile_required,
+  });
 }

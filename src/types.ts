@@ -10,8 +10,8 @@ export interface Env {
   // Workers AI binding
   AI: Ai;
 
-  // KV namespace (activate when ready)
-  // KV: KVNamespace;
+  // KV namespace for rate limiting
+  RL: KVNamespace;
 
   // Secrets (set via `wrangler secret put`)
   // RESEND_API_KEY: string;

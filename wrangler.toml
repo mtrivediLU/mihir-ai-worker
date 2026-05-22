@@ -19,10 +19,14 @@ database_id = "06c57d13-f79e-4d3a-b7df-54b7ef9e7aa1"
 [ai]
 binding = "AI"
 
-# Cloudflare KV binding (activate when KV namespace is ready)
-# [[kv_namespaces]]
-# binding = "KV"
-# id = "YOUR_KV_NAMESPACE_ID"
+# Cloudflare KV binding — used for rate limiting
+# ⚠️  BEFORE DEPLOYING: replace the id below with your real namespace ID.
+#    Find it at: Cloudflare Dashboard → Workers & Pages → KV
+#    Or run:     npx wrangler kv namespace list
+#    The binding works locally with any placeholder (Wrangler creates a local store).
+[[kv_namespaces]]
+binding = "RL"
+id = "41eeb5b2cf4f459fbf8e36c9be09863c"
 
 # Secrets to bind at runtime (set via `wrangler secret put`):
 #   RESEND_API_KEY

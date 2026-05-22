@@ -1,6 +1,7 @@
 import type { Env } from "../types";
 import { generateRandomHex, signHmac, hashIp } from "../lib/crypto";
 import { createSession } from "../lib/d1";
+import { incrementRateLimit, RATE_LIMITS, RL_KEYS, tooManyRequests } from "../lib/kv";
 
 // Subset of Cloudflare's IncomingRequestCfProperties we actually read.
 interface CfGeo {
@@ -26,6 +27,7 @@ export async function handleCreateSession(
   request: Request,
   env: Env,
 ): Promise<Response> {
+  // 1. Require secrets
   if (!env.SESSION_HMAC_KEY || !env.IP_HASH_SALT) {
     return Response.json(
       {
@@ -38,20 +40,35 @@ export async function handleCreateSession(
   }
 
   const cf = (request as Request & { cf?: CfGeo }).cf;
-
   const ip = request.headers.get("CF-Connecting-IP") ?? null;
   const rawUa = request.headers.get("User-Agent") ?? null;
   const referrer = request.headers.get("Referer") ?? null;
   const landingPath = new URL(request.url).pathname;
 
+  // 2. Hash IP early — needed for both rate limiting and D1 storage.
+  const ipHash = ip ? await hashIp(ip, env.IP_HASH_SALT) : null;
+  const rlId = ipHash ?? "unknown";
+
+  // 3. Per-IP session creation rate limit (10 per hour).
+  const rl = await incrementRateLimit(
+    env,
+    RL_KEYS.sessionIp(rlId),
+    RATE_LIMITS.SESSION_PER_IP.limit,
+    RATE_LIMITS.SESSION_PER_IP.windowMs,
+  );
+  if (!rl.allowed) {
+    return tooManyRequests(rl.retryAfterSeconds);
+  }
+
+  // 4. Generate session components
   const sessionId = crypto.randomUUID();
   const csrfSecret = generateRandomHex(32);
   const csrfToken = await signHmac(
     env.SESSION_HMAC_KEY,
     `${sessionId}.${csrfSecret}`,
   );
-  const ipHash = ip ? await hashIp(ip, env.IP_HASH_SALT) : null;
 
+  // 5. Write session to D1
   try {
     await createSession(env, {
       id: sessionId,
