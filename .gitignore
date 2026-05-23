@@ -11,3 +11,6 @@ dist/
 # Claude Code local overrides — never commit
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Claude Code local settings
+.claude/

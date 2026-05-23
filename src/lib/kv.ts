@@ -12,9 +12,10 @@ export interface RateLimitResult {
 // ─── Rate limit configurations ─────────────────────────────────────────────────
 
 export const RATE_LIMITS = {
-  SESSION_PER_IP: { limit: 10, windowMs: 60 * 60 * 1000 }, // 10 per hour
-  CHAT_PER_IP: { limit: 30, windowMs: 10 * 60 * 1000 }, // 30 per 10 min
-  CHAT_GLOBAL: { limit: 5000, windowMs: 24 * 60 * 60 * 1000 }, // 5000 per day
+  SESSION_PER_IP: { limit: 10,   windowMs: 60 * 60 * 1000 },        // 10   per hour
+  CHAT_PER_IP:    { limit: 30,   windowMs: 10 * 60 * 1000 },        // 30   per 10 min
+  CHAT_GLOBAL:    { limit: 5000, windowMs: 24 * 60 * 60 * 1000 },   // 5000 per day
+  LEAD_PER_IP:    { limit: 3,    windowMs: 60 * 60 * 1000 },        // 3    per hour
   SESSION_MSG_CAP: 50, // hard cap: total messages stored per session (D1-based)
 } as const;
 
@@ -22,8 +23,9 @@ export const RATE_LIMITS = {
 
 export const RL_KEYS = {
   sessionIp: (id: string) => `rl:session:ip:${id}`,
-  chatIp: (id: string) => `rl:chat:ip:${id}`,
-  chatGlobal: () => `rl:chat:global`,
+  chatIp:    (id: string) => `rl:chat:ip:${id}`,
+  chatGlobal: ()          => `rl:chat:global`,
+  leadIp:    (id: string) => `rl:lead:ip:${id}`,
 } as const;
 
 // ─── Core helper ──────────────────────────────────────────────────────────────

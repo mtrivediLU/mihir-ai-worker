@@ -190,10 +190,30 @@ export async function getSessionMessages(
 }
 
 export async function insertLead(
-  _env: Env,
-  _lead: LeadInsert,
-): Promise<void> {
-  throw new Error("TODO: implement insertLead");
+  env: Env,
+  lead: LeadInsert,
+): Promise<number> {
+  const result = await env.DB.prepare(
+    `INSERT INTO leads
+       (session_id, name, email, phone, organization, reason, intent,
+        opt_in_email, follow_up_status, notes, email_sent)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      lead.session_id,
+      lead.name,
+      lead.email,
+      lead.phone,
+      lead.organization,
+      lead.reason,
+      lead.intent,
+      lead.opt_in_email,
+      lead.follow_up_status,
+      lead.notes,
+      lead.email_sent,
+    )
+    .run();
+  return result.meta.last_row_id as number;
 }
 
 export async function upsertSummary(
