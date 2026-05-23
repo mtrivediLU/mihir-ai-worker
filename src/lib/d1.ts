@@ -216,6 +216,15 @@ export async function insertLead(
   return result.meta.last_row_id as number;
 }
 
+export async function markLeadEmailSent(
+  env: Env,
+  leadId: number,
+): Promise<void> {
+  await env.DB.prepare(`UPDATE leads SET email_sent = 1 WHERE id = ?`)
+    .bind(leadId)
+    .run();
+}
+
 export async function upsertSummary(
   _env: Env,
   _summary: Omit<Summary, "created_at">,

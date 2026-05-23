@@ -14,7 +14,9 @@ export interface Env {
   RL: KVNamespace;
 
   // Secrets (set via `wrangler secret put`)
-  // RESEND_API_KEY: string;
+  RESEND_API_KEY?: string;
+  LEAD_NOTIFY_TO?: string;
+  LEAD_NOTIFY_FROM?: string;
   TURNSTILE_SECRET_KEY?: string;
   SESSION_HMAC_KEY?: string;
   IP_HASH_SALT?: string;

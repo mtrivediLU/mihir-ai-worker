@@ -11,3 +11,10 @@ IP_HASH_SALT=replace-with-a-different-long-random-secret
 # Leave unset in local dev; the dev bypass token ("dev-turnstile-token") is used
 # when ENV=dev and TURNSTILE_SECRET_KEY is not set.
 # TURNSTILE_SECRET_KEY=your-turnstile-secret-key-here
+
+# Resend email notification — get API key from resend.com dashboard.
+# Leave all three unset in local dev to skip email (lead is still saved to D1).
+# In production, set via: wrangler secret put RESEND_API_KEY
+# RESEND_API_KEY=re_placeholder_key_here
+# LEAD_NOTIFY_TO=your-notification-email@example.com
+# LEAD_NOTIFY_FROM=noreply@yourdomain.com

@@ -1,7 +1,8 @@
 import type { Env } from "../types";
 import { verifyHmac } from "../lib/crypto";
-import { getSession, insertLead } from "../lib/d1";
+import { getSession, insertLead, markLeadEmailSent } from "../lib/d1";
 import { incrementRateLimit, RATE_LIMITS, RL_KEYS, tooManyRequests } from "../lib/kv";
+import { sendLeadNotification } from "../lib/email";
 
 // Minimal email format check — no external library, no over-engineering.
 // Validates: local@domain.tld without spaces or double-@.
@@ -138,6 +139,30 @@ export async function handleCreateLead(
   } catch (err) {
     console.error("insertLead failed:", err);
     return Response.json({ error: "Failed to save lead" }, { status: 500 });
+  }
+
+  // 7. Send email notification — non-fatal; never fail the visitor response.
+  const emailResult = await sendLeadNotification(env, {
+    lead_id: leadId,
+    session_id: session.id,
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    phone: trimmedPhone,
+    organization: trimmedOrg,
+    reason: reason.trim(),
+    intent: trimmedIntent,
+    opt_in_email: optIn,
+  });
+
+  if (emailResult.success) {
+    try {
+      await markLeadEmailSent(env, leadId);
+    } catch (err) {
+      console.error("markLeadEmailSent failed:", err);
+    }
+  } else if (emailResult.errorMessage !== "Resend env vars not configured") {
+    // Only log unexpected failures, not the expected "not configured" case in dev.
+    console.error("sendLeadNotification failed:", emailResult.errorMessage);
   }
 
   return Response.json({ success: true, lead_id: leadId }, { status: 201 });
