@@ -7,6 +7,7 @@ dist/
 *.pem
 *.key
 *.secret
+.DS_Store
 
 # Claude Code local overrides — never commit
 CLAUDE.local.md
