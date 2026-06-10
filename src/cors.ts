@@ -1,11 +1,21 @@
-const ALLOWED_ORIGINS = [
-  "http://localhost:5500",
-  "http://127.0.0.1:5500",
+import type { Env } from "./types";
+
+const PRODUCTION_ORIGINS = [
   "https://mihirtrivedi.tech",
   "https://www.mihirtrivedi.tech",
 ];
 
-export function corsHeaders(request: Request): HeadersInit {
+const DEV_ORIGINS = [
+  "http://localhost:5500",
+  "http://127.0.0.1:5500",
+  ...PRODUCTION_ORIGINS,
+];
+
+function allowedOrigins(env: Env): string[] {
+  return env.ENV === "production" ? PRODUCTION_ORIGINS : DEV_ORIGINS;
+}
+
+export function corsHeaders(request: Request, env: Env): HeadersInit {
   const origin = request.headers.get("Origin") ?? "";
 
   const headers: HeadersInit = {
@@ -14,18 +24,18 @@ export function corsHeaders(request: Request): HeadersInit {
     "Access-Control-Max-Age": "86400",
   };
 
-  if (ALLOWED_ORIGINS.includes(origin)) {
+  if (allowedOrigins(env).includes(origin)) {
     headers["Access-Control-Allow-Origin"] = origin;
   }
 
   return headers;
 }
 
-export function handlePreflight(request: Request): Response | null {
+export function handlePreflight(request: Request, env: Env): Response | null {
   if (request.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
-      headers: corsHeaders(request),
+      headers: corsHeaders(request, env),
     });
   }
 

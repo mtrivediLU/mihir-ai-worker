@@ -4,9 +4,9 @@ compatibility_date = "2024-11-01"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"
 VERSION = "0.1.0"
-ENV = "dev"
+ENV = "production"
 
 # Cloudflare D1 binding
 # Replace database_id with your actual ID from: npx wrangler d1 list
