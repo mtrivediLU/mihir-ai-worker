@@ -4,7 +4,10 @@ import { SYSTEM_PROMPT_CHAT, PROMPT_VERSION } from "./prompts";
 import { PROFILE_TEXT, PROFILE } from "./profile";
 
 // Model used for all chat inference. Swap here to upgrade across the whole app.
-export const AI_MODEL = "@cf/meta/llama-3.1-8b-instruct" as const;
+// NOTE: "@cf/meta/llama-3.1-8b-instruct" was deprecated by Cloudflare on
+// 2026-05-30 (AiError 5028). Replaced with the FP8 variant of the same
+// Llama 3.1 8B model — a drop-in, currently-supported equivalent.
+export const AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8" as const;
 
 // Model label stored in D1 — includes prompt version for traceability.
 export const MODEL_LABEL = `${AI_MODEL}@${PROMPT_VERSION}`;
