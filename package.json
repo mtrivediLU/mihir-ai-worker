@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "chunk": "node scripts/chunk.js",
+    "index": "node scripts/index.js",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
