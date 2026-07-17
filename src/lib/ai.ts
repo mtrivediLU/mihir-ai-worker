@@ -1,6 +1,6 @@
 import type { Env } from "../types";
 import type { Message } from "./d1";
-import { SYSTEM_PROMPT_CHAT, PROMPT_VERSION } from "./prompts";
+import { SYSTEM_PROMPT_CHAT, SYSTEM_PROMPT_RAG, PROMPT_VERSION } from "./prompts";
 import { PROFILE_TEXT, PROFILE } from "./profile";
 
 // Model used for all chat inference. Swap here to upgrade across the whole app.
@@ -28,8 +28,11 @@ export async function getAiReply(
   env: Env,
   userMessage: string,
   history: Message[],
+  ragContext?: string,
 ): Promise<AiResult> {
-  const systemContent = SYSTEM_PROMPT_CHAT(PROFILE_TEXT, PROFILE.availability);
+  const systemContent = ragContext
+    ? SYSTEM_PROMPT_RAG(ragContext)
+    : SYSTEM_PROMPT_CHAT(PROFILE_TEXT, PROFILE.availability);
 
   // Build the messages array: system prompt + recent history + current user turn.
   // Filter out any stored system-role rows to avoid injecting a duplicate system

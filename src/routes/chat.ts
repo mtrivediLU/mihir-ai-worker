@@ -11,6 +11,22 @@ import {
   tooManyRequests,
 } from "../lib/kv";
 import { verifyTurnstile } from "../lib/turnstile";
+import { retrieve, type RetrievedChunk } from "../retrieval";
+
+const RAG_UNAVAILABLE_RESPONSE =
+  "I don't have enough information in Mihir's portfolio to answer that. You can reach Mihir directly at mtrivedi@laurentian.ca.";
+
+function isRagEnabled(env: Env): boolean {
+  return env.RAG_ENABLED?.toLowerCase() === "true" || env.RAG_ENABLED === "1";
+}
+
+function buildRagContext(chunks: RetrievedChunk[]): string {
+  return chunks.map((chunk) => `[${chunk.id}]\n${chunk.content}`).join("\n\n");
+}
+
+function citedIds(answer: string): string[] {
+  return [...new Set([...answer.matchAll(/\[([A-Za-z0-9_-]+#\d+)\]/g)].map((match) => match[1]))];
+}
 
 // ─── Helper: persist a user+assistant turn and update the session ──────────────
 
@@ -191,7 +207,11 @@ export async function handleChat(
       console.error("persistTurn (injection) failed:", err);
     }
     return Response.json({
+      // reply is retained for the existing portfolio frontend during its migration.
       reply: REFUSAL_RESPONSE,
+      answer: REFUSAL_RESPONSE,
+      citations: [],
+      retrieved: [],
       session_id: session.id,
       turnstile_required: turnstileRequired,
     });
@@ -206,10 +226,36 @@ export async function handleChat(
     history = []; // non-fatal — proceed without history
   }
 
-  // 11. Call Workers AI
+  // 11. Retrieve portfolio context only when the opt-in RAG flag is enabled.
+  let retrieved: RetrievedChunk[] = [];
+  let ragContext: string | undefined;
+  if (isRagEnabled(env)) {
+    try {
+      retrieved = await retrieve(env, trimmedMessage);
+      ragContext = buildRagContext(retrieved);
+    } catch (err) {
+      console.error("RAG retrieval failed:", err);
+      const aiResult = { reply: RAG_UNAVAILABLE_RESPONSE, model: "rag-unavailable", latency_ms: 0 };
+      try {
+        await persistTurn(env, session.id, trimmedMessage, aiResult.reply, aiResult.model, aiResult.latency_ms);
+      } catch (persistError) {
+        console.error("persistTurn (RAG unavailable) failed:", persistError);
+      }
+      return Response.json({
+        reply: aiResult.reply,
+        answer: aiResult.reply,
+        citations: [],
+        retrieved: [],
+        session_id: session.id,
+        turnstile_required: turnstileRequired,
+      });
+    }
+  }
+
+  // 12. Call Workers AI
   let aiResult;
   try {
-    aiResult = await getAiReply(env, trimmedMessage, history);
+    aiResult = await getAiReply(env, trimmedMessage, history, ragContext);
   } catch (err) {
     console.error("Workers AI failed:", err);
     aiResult = {
@@ -219,7 +265,21 @@ export async function handleChat(
     };
   }
 
-  // 12. Persist the turn to D1
+  // 13. Validate citations produced by the RAG response before persisting it.
+  const citations = citedIds(aiResult.reply);
+  if (isRagEnabled(env)) {
+    const retrievedIds = new Set(retrieved.map((chunk) => chunk.id));
+    const hallucinated = citations.filter((id) => !retrievedIds.has(id));
+    if (hallucinated.length) {
+      console.log("rag_hallucinated_citation", {
+        cited_ids: hallucinated,
+        retrieved_ids: [...retrievedIds],
+        session_id: session.id,
+      });
+    }
+  }
+
+  // 14. Persist the turn to D1
   try {
     await persistTurn(
       env,
@@ -234,10 +294,13 @@ export async function handleChat(
     return Response.json({ error: "Failed to save message" }, { status: 500 });
   }
 
-  // 13. Respond — include turnstile_required flag.
+  // 15. Respond — reply is retained for the existing frontend; answer is the RAG API field.
   //    true once the session has accumulated 5+ messages (post-turn count).
   return Response.json({
     reply: aiResult.reply,
+    answer: aiResult.reply,
+    citations,
+    retrieved,
     session_id: session.id,
     turnstile_required: turnstileRequired,
   });

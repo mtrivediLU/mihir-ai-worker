@@ -3,6 +3,7 @@ export interface Env {
   ENVIRONMENT: string;
   VERSION: string;
   ENV: string;
+  RAG_ENABLED?: string;
 
   // D1 database binding
   DB: D1Database;
