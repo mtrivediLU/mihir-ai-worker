@@ -1,0 +1,29 @@
+flowchart TD
+    Q["User question"]
+    QE["embedQuery()<br/>Workers AI BGE embedding, L2-normalized"]
+    VS["vectorSearch()<br/>in-memory dot product vs 21 chunk vectors"]
+    KS["keywordSearch()<br/>D1 FTS5 MATCH, bm25() ranking"]
+    TOP["Top ~20 candidates from each list"]
+    RRF["rrfFuse()<br/>Reciprocal Rank Fusion, k = 60"]
+    RR["rerank()<br/>Workers AI LLM ranks fused candidates<br/>falls back to fused order on failure"]
+    TOP5["Top 5 chunks"]
+    CTX["buildRagContext()<br/>[chunk_id]\\ncontent, joined"]
+    GEN["getAiReply() with SYSTEM_PROMPT_RAG<br/>context = reference material, not instructions"]
+    ANS["Generated answer with<br/>inline [doc_id#index] citations"]
+    CITE["citedIds() extracts citation IDs"]
+    FILTER["Filter citations to IDs<br/>actually in retrieved set"]
+    LOG1["Hallucinated IDs logged:<br/>rag_hallucinated_citation"]
+    GROUND["assessGrounding()<br/>lexical overlap of claim vs cited chunk"]
+    LOG2["Unsupported claims logged:<br/>rag_ungrounded_claim (observability only)"]
+    RESP["API response<br/>reply, answer, citations, retrieved"]
+
+    Q --> QE --> VS
+    Q --> KS
+    VS --> TOP
+    KS --> TOP
+    TOP --> RRF --> RR --> TOP5
+    TOP5 --> CTX --> GEN --> ANS
+    ANS --> CITE --> FILTER
+    FILTER --> LOG1
+    FILTER --> RESP
+    ANS --> GROUND --> LOG2

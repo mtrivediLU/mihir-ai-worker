@@ -1,0 +1,29 @@
+flowchart TD
+    MD["content/*.md<br/>(5 files: experience, skills,<br/>projects, education, certifications)"]
+    FM["Parse YAML frontmatter<br/>doc_id, source, title"]
+    SEC["Split on ## headings<br/>scripts/chunk.js: splitSections"]
+    LEN{"Section under<br/>~400 tokens?"}
+    ONE["One chunk"]
+    SPLIT["Split at paragraph boundaries<br/>+ ~15% trailing overlap"]
+    PREFIX["Prefix embed_text with<br/>[Title > Heading]"]
+    HASH["SHA-256 content_hash<br/>of embed_text"]
+    CACHE{"Hash already in<br/>data/embedding-cache.json?"}
+    SKIP["Reuse cached vector<br/>(no API call)"]
+    EMBED["Workers AI<br/>@cf/baai/bge-base-en-v1.5"]
+    NORM["L2-normalize vector<br/>(768 dimensions)"]
+    BLOB["Serialize as little-endian<br/>Float32 BLOB"]
+    SEED["Write data/seed.sql<br/>+ data/index.json"]
+    CHUNKS[("D1 chunks table<br/>id, doc_id, content, embedding BLOB")]
+    FTS[("D1 chunks_fts<br/>virtual FTS5 table")]
+
+    MD --> FM --> SEC --> LEN
+    LEN -->|yes| ONE
+    LEN -->|no| SPLIT
+    ONE --> PREFIX
+    SPLIT --> PREFIX
+    PREFIX --> HASH --> CACHE
+    CACHE -->|yes| SKIP --> BLOB
+    CACHE -->|no| EMBED --> NORM --> BLOB
+    BLOB --> SEED
+    SEED --> CHUNKS
+    SEED --> FTS

@@ -1,0 +1,60 @@
+sequenceDiagram
+    autonumber
+    actor V as Visitor
+    participant FE as chat.js (frontend)
+    participant W as Worker (chat.ts)
+    participant KV as Cloudflare KV
+    participant D1 as D1 (sessions/messages)
+    participant TS as Turnstile
+    participant RAG as retrieval.ts
+    participant D1R as D1 (chunks/chunks_fts)
+    participant AI as Workers AI
+
+    V->>FE: Types a question, hits send
+    FE->>FE: Trim text, block if empty/loading
+    FE->>W: POST /api/chat {session_id, csrf_token, message}
+    W->>W: Validate JSON body + field types/length
+    W->>D1: getSession(session_id)
+    D1-->>W: session row (or null)
+    alt no session or ended
+        W-->>FE: 401 Invalid/ended session
+    end
+    W->>W: verifyHmac(csrf_token) against session.csrf_secret
+    alt CSRF invalid
+        W-->>FE: 403 Invalid CSRF token
+    end
+    W->>W: Check session.message_count >= 50 (D1 hard cap)
+    W->>KV: incrementRateLimit (global 5000/day)
+    W->>KV: incrementRateLimit (per-IP 30/10min)
+    alt rate limited
+        W-->>FE: 429 Too Many Requests
+    end
+    alt session.message_count + 2 >= 5
+        W->>TS: verifyTurnstile(turnstile_token)
+        alt token missing/invalid
+            W-->>FE: 403 Turnstile required/failed
+        end
+    end
+    W->>W: Test message against INJECTION_PATTERNS
+    alt injection detected
+        W->>D1: persistTurn(user msg, REFUSAL_RESPONSE)
+        W-->>FE: 200 {reply: refusal, citations: []}
+    end
+    W->>D1: getSessionMessages(last 6)
+    alt RAG_ENABLED = true
+        W->>RAG: retrieve(query)
+        RAG->>AI: embedQuery (BGE embedding)
+        RAG->>RAG: vectorSearch (in-memory dot product)
+        RAG->>D1R: keywordSearch (FTS5 MATCH)
+        RAG->>RAG: rrfFuse(vector, keyword)
+        RAG->>AI: rerank(top ~20 candidates)
+        AI-->>RAG: ranked ID list
+        RAG-->>W: top 5 chunks
+    end
+    W->>AI: getAiReply(message, history, ragContext)
+    AI-->>W: generated reply text
+    W->>W: Extract citation IDs, filter to retrieved set
+    W->>W: assessGrounding (log-only lexical check)
+    W->>D1: persistTurn(user + assistant messages)
+    W-->>FE: 200 {reply, answer, citations, retrieved, turnstile_required}
+    FE->>V: Render assistant bubble
