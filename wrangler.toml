@@ -7,7 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 ENVIRONMENT = "production"
 VERSION = "0.1.0"
 ENV = "production"
-RAG_ENABLED = "false"
+RAG_ENABLED = "true"
 
 # Cloudflare D1 binding
 # Replace database_id with your actual ID from: npx wrangler d1 list

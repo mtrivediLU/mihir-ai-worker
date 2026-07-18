@@ -5,7 +5,7 @@
   "scripts": {
     "chunk": "node scripts/chunk.js",
     "index": "node scripts/index.js",
-    "eval": "node eval/run.js",
+    "eval": "node eval/run.js && node --test tests/chat-rag.test.js",
     "test": "node --test tests/*.test.js",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",

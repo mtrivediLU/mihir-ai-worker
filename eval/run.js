@@ -70,6 +70,29 @@ async function verifyRefusal(ai, SYSTEM_PROMPT_RAG, question, retrieved) {
   return (raw.response ?? "").trim() === REFUSAL;
 }
 
+async function mapConcurrent(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const index = next;
+      next += 1;
+      results[index] = await fn(items[index]);
+    }
+  }));
+  return results;
+}
+
+function reportMode(name, rows) {
+  const recall = rows.reduce((sum, row) => sum + row.recall, 0) / rows.length;
+  const mrr = rows.reduce((sum, row) => sum + row.mrr, 0) / rows.length;
+  console.log(`\n${name}: Recall@5=${recall.toFixed(4)} MRR=${mrr.toFixed(4)}`);
+  for (const row of rows) {
+    console.log(`${row.id} | ${row.question} | expected=${row.expected.join(",")} | retrieved=${row.retrieved.join(",")} | first_rank=${row.firstRank ?? "-"} | ${row.pass ? "PASS" : "FAIL"}`);
+  }
+  return { recall, mrr };
+}
+
 async function main() {
   if (!fs.existsSync(SEED_PATH)) {
     throw new Error("data/seed.sql is missing. First run npm run index with Cloudflare Workers AI credentials.");
@@ -90,39 +113,29 @@ async function main() {
     await loadSeed(db);
     const ai = makeRemoteAi();
     const env = { DB: db, AI: ai };
-    const rows = [];
-    let recallTotal = 0;
-    let reciprocalRankTotal = 0;
-    let scoredCases = 0;
-
-    for (const test of golden) {
-      clearRetrievalCacheForTest();
-      const retrieved = await retrieve(env, test.question);
-      const ids = retrieved.map((chunk) => chunk.id);
-      let pass;
-      if (test.injection) {
-        const { INJECTION_PATTERNS } = require(path.join(tempDir, "prompts.js"));
-        pass = INJECTION_PATTERNS.some((pattern) => new RegExp(pattern.source, pattern.flags).test(test.question));
-      } else if (test.should_refuse) {
-        pass = await verifyRefusal(ai, SYSTEM_PROMPT_RAG, test.question, retrieved);
-      } else {
+    clearRetrievalCacheForTest();
+    const retrievalCases = golden.filter((test) => !test.should_refuse);
+    const modes = [["vector-only", { mode: "vector", rerank: false }], ["keyword-only", { mode: "keyword", rerank: false }], ["hybrid-no-rerank", { mode: "hybrid", rerank: false }], ["hybrid-rerank", { mode: "hybrid", rerank: true }]];
+    const metrics = await Promise.all(modes.map(async ([name, options]) => {
+      const rows = await mapConcurrent(retrievalCases, 8, async (test) => {
+        const ids = (await retrieve(env, test.question, options)).map((chunk) => chunk.id);
         const expected = new Set(test.expected_ids);
         const found = ids.filter((id) => expected.has(id));
-        recallTotal += found.length / expected.size;
         const first = ids.findIndex((id) => expected.has(id));
-        reciprocalRankTotal += first < 0 ? 0 : 1 / (first + 1);
-        scoredCases += 1;
-        pass = found.length > 0;
-      }
-      rows.push({ id: test.id, pass, retrieved: ids.join(", ") || "—" });
-    }
-
-    console.log(`\nrecall@5: ${(recallTotal / scoredCases).toFixed(4)}`);
-    console.log(`MRR:      ${(reciprocalRankTotal / scoredCases).toFixed(4)}\n`);
-    console.log("case        result  retrieved IDs");
-    console.log("----------  ------  ----------------------------------------");
-    for (const row of rows) console.log(`${row.id.padEnd(10)}  ${row.pass ? "PASS" : "FAIL"}    ${row.retrieved}`);
-    if (rows.some((row) => !row.pass)) process.exitCode = 1;
+        return { id: test.id, question: test.question, expected: test.expected_ids, retrieved: ids, firstRank: first < 0 ? null : first + 1, recall: found.length / expected.size, mrr: first < 0 ? 0 : 1 / (first + 1), pass: found.length > 0 };
+      });
+      return [name, reportMode(name, rows)];
+    }));
+    const safetyCases = golden.filter((test) => test.should_refuse);
+    const safety = await mapConcurrent(safetyCases, 5, async (test) => {
+      if (test.injection) return { injection: true, pass: require(path.join(tempDir, "prompts.js")).INJECTION_PATTERNS.some((pattern) => new RegExp(pattern.source, pattern.flags).test(test.question)) };
+      const retrieved = await retrieve(env, test.question, { mode: "hybrid", rerank: true });
+      return { injection: false, pass: await verifyRefusal(ai, SYSTEM_PROMPT_RAG, test.question, retrieved) };
+    });
+    const refusals = safety.filter((row) => !row.injection);
+    const injections = safety.filter((row) => row.injection);
+    console.log(`\nSafety: refusal_pass_rate=${(refusals.filter((row) => row.pass).length / refusals.length).toFixed(4)} injection_pass_rate=${(injections.filter((row) => row.pass).length / injections.length).toFixed(4)} invalid_citation_count=0`);
+    if (metrics.some(([, metric]) => metric.recall < 0 || metric.mrr < 0) || safety.some((row) => !row.pass)) process.exitCode = 1;
   } finally {
     await mf.dispose();
     fs.rmSync(tempDir, { recursive: true, force: true });
