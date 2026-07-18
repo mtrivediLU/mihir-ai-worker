@@ -12,6 +12,7 @@ import {
 } from "../lib/kv";
 import { verifyTurnstile } from "../lib/turnstile";
 import { retrieve, type RetrievedChunk } from "../retrieval";
+import { assessGrounding } from "../lib/grounding";
 
 const RAG_UNAVAILABLE_RESPONSE =
   "I don't have enough information in Mihir's portfolio to answer that. You can reach Mihir directly at mtrivedi@laurentian.ca.";
@@ -285,6 +286,18 @@ export async function handleChat(
     // Do not expose invented source IDs to the frontend; the event above keeps
     // observability without making the invalid citation part of the API contract.
     citations = cited.filter((id) => retrievedIds.has(id));
+
+    // Groundedness is observability-only: a deterministic lexical-overlap check
+    // (no LLM call) between cited sentences and the exact content they cite.
+    // Citation-ID validation above remains the sole gate on the response.
+    const grounding = assessGrounding(aiResult.reply, retrieved);
+    if (grounding.unsupportedCount > 0) {
+      console.log("rag_ungrounded_claim", {
+        unsupported_count: grounding.unsupportedCount,
+        supported_count: grounding.supportedCount,
+        session_id: session.id,
+      });
+    }
   }
 
   // 14. Persist the turn to D1
