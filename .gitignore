@@ -8,6 +8,7 @@ dist/
 *.key
 *.secret
 .DS_Store
+data/embedding-cache.json
 
 # Claude Code local overrides — never commit
 CLAUDE.local.md
