@@ -28,6 +28,10 @@ function citedIds(answer: string): string[] {
   return [...new Set([...answer.matchAll(/\[([A-Za-z0-9_-]+#\d+)\]/g)].map((match) => match[1]))];
 }
 
+function safeRetrieved(chunks: RetrievedChunk[]) {
+  return chunks.map(({ id, doc_id, source, heading, chunk_index }) => ({ id, doc_id, source, heading, chunk_index }));
+}
+
 // ─── Helper: persist a user+assistant turn and update the session ──────────────
 
 async function persistTurn(
@@ -266,10 +270,11 @@ export async function handleChat(
   }
 
   // 13. Validate citations produced by the RAG response before persisting it.
-  const citations = citedIds(aiResult.reply);
+  const cited = citedIds(aiResult.reply);
+  let citations = cited;
   if (isRagEnabled(env)) {
     const retrievedIds = new Set(retrieved.map((chunk) => chunk.id));
-    const hallucinated = citations.filter((id) => !retrievedIds.has(id));
+    const hallucinated = cited.filter((id) => !retrievedIds.has(id));
     if (hallucinated.length) {
       console.log("rag_hallucinated_citation", {
         cited_ids: hallucinated,
@@ -277,6 +282,9 @@ export async function handleChat(
         session_id: session.id,
       });
     }
+    // Do not expose invented source IDs to the frontend; the event above keeps
+    // observability without making the invalid citation part of the API contract.
+    citations = cited.filter((id) => retrievedIds.has(id));
   }
 
   // 14. Persist the turn to D1
@@ -300,7 +308,7 @@ export async function handleChat(
     reply: aiResult.reply,
     answer: aiResult.reply,
     citations,
-    retrieved,
+    retrieved: safeRetrieved(retrieved),
     session_id: session.id,
     turnstile_required: turnstileRequired,
   });

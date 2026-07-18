@@ -6,6 +6,7 @@ const VECTOR_LIMIT = 20;
 const FUSED_LIMIT = 20;
 const FINAL_LIMIT = 5;
 const RRF_K = 60;
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 export interface RetrievedChunk {
   id: string;
@@ -27,9 +28,12 @@ interface CachedChunk extends RetrievedChunk {
   vector: Float32Array;
 }
 
-let decodedChunkMatrix: CachedChunk[] | undefined;
+let decodedChunkMatrix: { expiresAt: number; chunks: CachedChunk[] } | undefined;
 
-function normalize(vector: number[]): Float32Array {
+export type RetrievalMode = "vector" | "keyword" | "hybrid";
+export interface RetrievalOptions { mode?: RetrievalMode; rerank?: boolean; }
+
+export function normalize(vector: number[]): Float32Array {
   const magnitude = Math.hypot(...vector);
   if (!Number.isFinite(magnitude) || magnitude === 0) {
     throw new Error("Workers AI returned an invalid embedding vector");
@@ -37,15 +41,17 @@ function normalize(vector: number[]): Float32Array {
   return Float32Array.from(vector, (value) => value / magnitude);
 }
 
-function decodeVector(blob: ArrayBuffer | Uint8Array): Float32Array {
+export function decodeVector(blob: ArrayBuffer | Uint8Array): Float32Array {
   const bytes = blob instanceof Uint8Array
     ? blob
     : new Uint8Array(blob);
   if (bytes.byteLength % Float32Array.BYTES_PER_ELEMENT !== 0) {
     throw new Error("Invalid embedding BLOB length in D1");
   }
-  const copy = bytes.slice();
-  return new Float32Array(copy.buffer, copy.byteOffset, copy.byteLength / Float32Array.BYTES_PER_ELEMENT);
+  const vector = new Float32Array(bytes.byteLength / Float32Array.BYTES_PER_ELEMENT);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  for (let index = 0; index < vector.length; index += 1) vector[index] = view.getFloat32(index * 4, true);
+  return vector;
 }
 
 function asEmbedding(raw: unknown): number[] {
@@ -65,17 +71,18 @@ export async function embedQuery(env: Env, query: string): Promise<Float32Array>
 }
 
 async function getDecodedChunkMatrix(env: Env): Promise<CachedChunk[]> {
-  if (decodedChunkMatrix) return decodedChunkMatrix;
+  if (decodedChunkMatrix && decodedChunkMatrix.expiresAt > Date.now()) return decodedChunkMatrix.chunks;
 
   const result = await env.DB.prepare(
     `SELECT id, doc_id, source, heading, chunk_index, content, token_count, content_hash, embedding
      FROM chunks`,
   ).all<StoredChunk>();
-  decodedChunkMatrix = result.results.map(({ embedding, ...chunk }) => ({
+  const chunks = result.results.map(({ embedding, ...chunk }) => ({
     ...chunk,
     vector: decodeVector(embedding),
   }));
-  return decodedChunkMatrix;
+  decodedChunkMatrix = { chunks, expiresAt: Date.now() + CACHE_TTL_MS };
+  return chunks;
 }
 
 function dot(left: Float32Array, right: Float32Array): number {
@@ -93,13 +100,13 @@ export async function vectorSearch(
   const matrix = await getDecodedChunkMatrix(env);
   return matrix
     .map(({ vector, ...chunk }) => ({ ...chunk, score: dot(queryVector, vector) }))
-    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))
+    .sort((left, right) => ((right.score ?? 0) - (left.score ?? 0)) || left.id.localeCompare(right.id))
     .slice(0, limit);
 }
 
 export function sanitizeFtsQuery(query: string): string | null {
   const terms = query.match(/[\p{L}\p{N}_]+/gu)?.slice(0, 16) ?? [];
-  return terms.length ? terms.map((term) => `"${term.replace(/"/g, "")}"`).join(" AND ") : null;
+  return terms.length ? terms.map((term) => `"${term.replace(/"/g, "")}"`).join(" OR ") : null;
 }
 
 export async function keywordSearch(
@@ -129,14 +136,17 @@ export function rrfFuse(
   const byId = new Map<string, RetrievedChunk>();
   const scores = new Map<string, number>();
   for (const list of lists) {
+    const seen = new Set<string>();
     list.forEach((chunk, index) => {
+      if (seen.has(chunk.id)) return;
+      seen.add(chunk.id);
       byId.set(chunk.id, chunk);
       scores.set(chunk.id, (scores.get(chunk.id) ?? 0) + 1 / (k + index + 1));
     });
   }
   return [...byId.values()]
     .map((chunk) => ({ ...chunk, score: scores.get(chunk.id) ?? 0 }))
-    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))
+    .sort((left, right) => ((right.score ?? 0) - (left.score ?? 0)) || left.id.localeCompare(right.id))
     .slice(0, limit);
 }
 
@@ -147,7 +157,8 @@ function parseRerankedIds(response: string, candidates: RetrievedChunk[]): strin
   try {
     const values: unknown = JSON.parse(json);
     if (!Array.isArray(values)) return [];
-    return values.filter((value): value is string => typeof value === "string" && allowed.has(value));
+    const ids = values.filter((value): value is string => typeof value === "string" && allowed.has(value));
+    return [...new Set(ids)];
   } catch {
     return [];
   }
@@ -186,11 +197,13 @@ export async function rerank(
   return candidates.slice(0, limit);
 }
 
-export async function retrieve(env: Env, query: string): Promise<RetrievedChunk[]> {
-  const [queryVector, keyword] = await Promise.all([embedQuery(env, query), keywordSearch(env, query)]);
-  const dense = await vectorSearch(env, queryVector);
-  const fused = rrfFuse([dense, keyword]);
-  return rerank(env, query, fused);
+export async function retrieve(env: Env, query: string, options: RetrievalOptions = {}): Promise<RetrievedChunk[]> {
+  const mode = options.mode ?? "hybrid";
+  const shouldRerank = options.rerank ?? true;
+  const dense = mode === "keyword" ? [] : await embedQuery(env, query).then((vector) => vectorSearch(env, vector));
+  const keyword = mode === "vector" ? [] : await keywordSearch(env, query);
+  const fused = mode === "vector" ? dense : mode === "keyword" ? keyword : rrfFuse([dense, keyword]);
+  return shouldRerank ? rerank(env, query, fused) : fused.slice(0, FINAL_LIMIT);
 }
 
 export function clearRetrievalCacheForTest(): void {

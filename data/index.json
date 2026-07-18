@@ -1,0 +1,111 @@
+{
+  "embedding_model": "@cf/baai/bge-base-en-v1.5",
+  "dimensions": 768,
+  "chunks": [
+    {
+      "id": "certifications#0",
+      "content_hash": "ec0c99c2cacb22acaac5e92bd8cbb6e1784c9d77a65640232b659dc642c41b6e",
+      "token_count": 35
+    },
+    {
+      "id": "certifications#1",
+      "content_hash": "fc1f736fbb7e1ffb5482c2b1c7a828a0b07e0bb03bfa9678d475aca991951d76",
+      "token_count": 45
+    },
+    {
+      "id": "certifications#2",
+      "content_hash": "120a4fde54aba6d4773cfb878db55045b49dd511b0b68e13b7d39840c3db078d",
+      "token_count": 25
+    },
+    {
+      "id": "education#0",
+      "content_hash": "542eff645177eda2efff569969a7173a07ffb280f43123ec85ded984c45239c1",
+      "token_count": 63
+    },
+    {
+      "id": "education#1",
+      "content_hash": "091bb3a8cd800a76dd6c1fd926be934500d8e133f20abde28e3bac33de0ce9d1",
+      "token_count": 14
+    },
+    {
+      "id": "education#2",
+      "content_hash": "61d8a54b8e7f3897ab6319ac1bcec592b03564523dd5c39b0e6ca9b9dc36e67f",
+      "token_count": 81
+    },
+    {
+      "id": "experience#0",
+      "content_hash": "3f3f4aeda0b409519588161d87a6405494ada36f75d3a1a1ac6e2c67f3273dcf",
+      "token_count": 96
+    },
+    {
+      "id": "experience#1",
+      "content_hash": "cddf2440d7ca541cd05bd08b98e7691aca628ebd6fdfc7a6674af1ef5c303d60",
+      "token_count": 56
+    },
+    {
+      "id": "experience#2",
+      "content_hash": "71a5c5f24670bd4796218ca6eae5097de200867ba37f32edeef66d88cd04fc74",
+      "token_count": 62
+    },
+    {
+      "id": "experience#3",
+      "content_hash": "b19b38dcded6c18c55cce844e5306ebc271d1bb93efb1878b9d8027e5bb655e7",
+      "token_count": 66
+    },
+    {
+      "id": "experience#4",
+      "content_hash": "c134a2335214cd25b61db87dbd43e7ceade8fee3ab75df5ad51826acbe116845",
+      "token_count": 73
+    },
+    {
+      "id": "experience#5",
+      "content_hash": "79addf2b73b29989e280a658dca1e52d5615f8c3d09629d8fa035a67cfb6ffa6",
+      "token_count": 94
+    },
+    {
+      "id": "projects#0",
+      "content_hash": "0e9281751476c655a8b2c917de6fdf1937d557db0aaf836e6b4a6ebec85fbc6d",
+      "token_count": 64
+    },
+    {
+      "id": "projects#1",
+      "content_hash": "b841fc46c0f377a3f2a3f9edd31cbf6374fdb4033b96bab851198491ad0d82fc",
+      "token_count": 46
+    },
+    {
+      "id": "projects#2",
+      "content_hash": "5f53e6acdce0bc0f540307b0fbc43aead0552fa09a6e091611e89f6215953482",
+      "token_count": 61
+    },
+    {
+      "id": "projects#3",
+      "content_hash": "3460280a2c689aaa9d145cbbeef64fc1899f00de3efe39f0ac11ef639ca62391",
+      "token_count": 59
+    },
+    {
+      "id": "projects#4",
+      "content_hash": "6877c0220635097f5bc6d85466bfdf018ab76f4b00ec3cdf3b73ae8651cc0ff8",
+      "token_count": 65
+    },
+    {
+      "id": "skills#0",
+      "content_hash": "81746fb2ec19824bd3d48ac1de26b5070428c9c72f1ba80c245b23d54a5d6173",
+      "token_count": 61
+    },
+    {
+      "id": "skills#1",
+      "content_hash": "9d319c88ee42d87534bd58a87c35848f969d424306e7be6df9c0b14e2d7d2ed7",
+      "token_count": 50
+    },
+    {
+      "id": "skills#2",
+      "content_hash": "4a8005ce63d4f31e08216dff60a95c81fb8dcef01be29587103255ea92be55a8",
+      "token_count": 47
+    },
+    {
+      "id": "skills#3",
+      "content_hash": "8a38710ef27d9dd5368d1de1c0c06440dad2aa08305399f6f45ef932fda954c7",
+      "token_count": 67
+    }
+  ]
+}

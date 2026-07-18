@@ -8,7 +8,7 @@
     "content": "Mihir holds AZ-305: Designing Azure Infrastructure Solutions (2024) and Azure Fundamentals, AZ-900 (2024; credential ID C669A77F8F67FB6D).",
     "embed_text": "[Mihir Trivedi — Certifications > Microsoft Azure Certifications]\nMihir holds AZ-305: Designing Azure Infrastructure Solutions (2024) and Azure Fundamentals, AZ-900 (2024; credential ID C669A77F8F67FB6D).",
     "token_count": 35,
-    "content_hash": "8b281efbc8c5f5aba609490892a2848ca32f3ab345f2f96f425f5ac4933966c8"
+    "content_hash": "ec0c99c2cacb22acaac5e92bd8cbb6e1784c9d77a65640232b659dc642c41b6e"
   },
   {
     "id": "certifications#1",
@@ -19,7 +19,7 @@
     "content": "Mihir holds Power BI Data Analyst Associate, PL-300 (2024; credential ID 982D4E48445B5F5D) and Power Platform Developer Associate, PL-400 (2024; credential ID E94F1B4F03BC2E34).",
     "embed_text": "[Mihir Trivedi — Certifications > Data and Power Platform Certifications]\nMihir holds Power BI Data Analyst Associate, PL-300 (2024; credential ID 982D4E48445B5F5D) and Power Platform Developer Associate, PL-400 (2024; credential ID E94F1B4F03BC2E34).",
     "token_count": 45,
-    "content_hash": "cbbe4a41e473668f5acfb4ef72fa0913c77671b712013256dc5d4f78a149f2ba"
+    "content_hash": "fc1f736fbb7e1ffb5482c2b1c7a828a0b07e0bb03bfa9678d475aca991951d76"
   },
   {
     "id": "certifications#2",
@@ -30,7 +30,7 @@
     "content": "Mihir holds the Salesforce Certified Agentforce Specialist, AI-201 (2025; credential ID 7292670).",
     "embed_text": "[Mihir Trivedi — Certifications > Salesforce Certification]\nMihir holds the Salesforce Certified Agentforce Specialist, AI-201 (2025; credential ID 7292670).",
     "token_count": 25,
-    "content_hash": "8f3c23ad37c56c96a0556ab51098470dbebf43a071f4bdca4764a0a502fb8e9a"
+    "content_hash": "120a4fde54aba6d4773cfb878db55045b49dd511b0b68e13b7d39840c3db078d"
   },
   {
     "id": "education#0",
@@ -41,7 +41,7 @@
     "content": "Laurentian University, Canada · 2021 – 2023\n\nMihir's thesis focused on machine learning for geological discovery. He delivered an oral presentation at AICMSE 2023 at the Harvard Faculty Club and co-authored a 2023 publication in Ore Geology Reviews.",
     "embed_text": "[Mihir Trivedi — Education and Publications > Master of Computational Science]\nLaurentian University, Canada · 2021 – 2023\n\nMihir's thesis focused on machine learning for geological discovery. He delivered an oral presentation at AICMSE 2023 at the Harvard Faculty Club and co-authored a 2023 publication in Ore Geology Reviews.",
     "token_count": 63,
-    "content_hash": "6f12c03d4b687c77b84fd1af83837fc14a25c17bc15c49ff3c62ddf8f473c147"
+    "content_hash": "542eff645177eda2efff569969a7173a07ffb280f43123ec85ded984c45239c1"
   },
   {
     "id": "education#1",
@@ -52,7 +52,7 @@
     "content": "Gujarat Technological University, India · 2013 – 2017",
     "embed_text": "[Mihir Trivedi — Education and Publications > Bachelor of Computer Engineering]\nGujarat Technological University, India · 2013 – 2017",
     "token_count": 14,
-    "content_hash": "4c635290792c7741296b2098db94f94c0278fef0574bea9f3c241ff95a115ed3"
+    "content_hash": "091bb3a8cd800a76dd6c1fd926be934500d8e133f20abde28e3bac33de0ce9d1"
   },
   {
     "id": "education#2",
@@ -63,7 +63,7 @@
     "content": "Mihir co-authored “A study of faults in the Superior province of Ontario and Quebec using random forest ML: Spatial relationship to gold mines,” published in Ore Geology Reviews in 2023 (DOI: 10.1016/j.oregeorev.2023.105403). He also presented “Machine Learning for Predictive Modeling of Mineral Deposits” at AICMSE 2023.",
     "embed_text": "[Mihir Trivedi — Education and Publications > Publication and Conference Presentation]\nMihir co-authored “A study of faults in the Superior province of Ontario and Quebec using random forest ML: Spatial relationship to gold mines,” published in Ore Geology Reviews in 2023 (DOI: 10.1016/j.oregeorev.2023.105403). He also presented “Machine Learning for Predictive Modeling of Mineral Deposits” at AICMSE 2023.",
     "token_count": 81,
-    "content_hash": "458e70971ff925f29503754b2c76ca18d4adeef4e7719f73f5e0dfeb5840b8fb"
+    "content_hash": "61d8a54b8e7f3897ab6319ac1bcec592b03564523dd5c39b0e6ca9b9dc36e67f"
   },
   {
     "id": "experience#0",
@@ -74,7 +74,7 @@
     "content": "Oct 2024 – Apr 2026 · Toronto, ON (Remote)\n\nMihir architected an Enterprise Data Warehouse with PostgreSQL and dbt, unifying sales, production, and HR data. He engineered a Generative AI assistant using OpenAI and Gemini APIs for plain-English queries across data sources. He also built ELT pipelines for Salesforce, HubSpot, ZoomInfo, and device logs and automated Tableau reporting.",
     "embed_text": "[Mihir Trivedi — Professional Experience > Flosonics Medical — Business Intelligence Developer]\nOct 2024 – Apr 2026 · Toronto, ON (Remote)\n\nMihir architected an Enterprise Data Warehouse with PostgreSQL and dbt, unifying sales, production, and HR data. He engineered a Generative AI assistant using OpenAI and Gemini APIs for plain-English queries across data sources. He also built ELT pipelines for Salesforce, HubSpot, ZoomInfo, and device logs and automated Tableau reporting.",
     "token_count": 96,
-    "content_hash": "cba322a61ff38745fed62726785781ebfdd4b9d9a3017da79855775a98102b8e"
+    "content_hash": "3f3f4aeda0b409519588161d87a6405494ada36f75d3a1a1ac6e2c67f3273dcf"
   },
   {
     "id": "experience#1",
@@ -85,7 +85,7 @@
     "content": "Jun 2024 – Jul 2025 · Sudbury, ON\n\nMihir built real-time safety dashboards for underground mining operations in partnership with Cementation. He owned end-to-end delivery across backend, frontend, and production deployment.",
     "embed_text": "[Mihir Trivedi — Professional Experience > LoopX — Software Development Consultant]\nJun 2024 – Jul 2025 · Sudbury, ON\n\nMihir built real-time safety dashboards for underground mining operations in partnership with Cementation. He owned end-to-end delivery across backend, frontend, and production deployment.",
     "token_count": 56,
-    "content_hash": "ad16670ba235950098af687d305a908fade36abdf210de798102db3ce1c19ddf"
+    "content_hash": "cddf2440d7ca541cd05bd08b98e7691aca628ebd6fdfc7a6674af1ef5c303d60"
   },
   {
     "id": "experience#2",
@@ -96,7 +96,7 @@
     "content": "May 2024 – Aug 2024 · Sudbury, ON\n\nMihir integrated a third-party vendor with SQL Server using SSIS, Python, and Google Cloud SQL Auth Proxy. He supported 911 and opioid-response reporting and built Service-Based Budgeting dashboards in Power BI.",
     "embed_text": "[Mihir Trivedi — Professional Experience > City of Greater Sudbury — Business Intelligence Analyst]\nMay 2024 – Aug 2024 · Sudbury, ON\n\nMihir integrated a third-party vendor with SQL Server using SSIS, Python, and Google Cloud SQL Auth Proxy. He supported 911 and opioid-response reporting and built Service-Based Budgeting dashboards in Power BI.",
     "token_count": 62,
-    "content_hash": "904283b68c7a5b6d96ec9a8591e6bb7474a14f6f85482a72a7c630bc0164ce6d"
+    "content_hash": "71a5c5f24670bd4796218ca6eae5097de200867ba37f32edeef66d88cd04fc74"
   },
   {
     "id": "experience#3",
@@ -107,7 +107,7 @@
     "content": "Oct 2023 – May 2024 · Sudbury, ON\n\nMihir led delivery of an offline-first mobile ground-control application for Vale using Microsoft Power Platform. He automated Workplace Safety North forms with Power Automate, reducing reporting from about five hours to minutes.",
     "embed_text": "[Mihir Trivedi — Professional Experience > Minax Inc. — Lead Software Developer]\nOct 2023 – May 2024 · Sudbury, ON\n\nMihir led delivery of an offline-first mobile ground-control application for Vale using Microsoft Power Platform. He automated Workplace Safety North forms with Power Automate, reducing reporting from about five hours to minutes.",
     "token_count": 66,
-    "content_hash": "e45b1d6c503ef30f0eb2be1d105db89f7186d4ced250ad2e313f1b1f91483311"
+    "content_hash": "b19b38dcded6c18c55cce844e5306ebc271d1bb93efb1878b9d8027e5bb655e7"
   },
   {
     "id": "experience#4",
@@ -118,7 +118,7 @@
     "content": "Mar 2022 – Jul 2023 · Sudbury, ON\n\nAt Laurentian University's Mineral Exploration Research Centre, Mihir applied machine learning to geological datasets and produced gold prospectivity maps with a 99.5% F1 score. His spatial analysis used ArcGIS and QGIS to assess mineralization probability.",
     "embed_text": "[Mihir Trivedi — Professional Experience > MERC — Research Associate (Data & ML)]\nMar 2022 – Jul 2023 · Sudbury, ON\n\nAt Laurentian University's Mineral Exploration Research Centre, Mihir applied machine learning to geological datasets and produced gold prospectivity maps with a 99.5% F1 score. His spatial analysis used ArcGIS and QGIS to assess mineralization probability.",
     "token_count": 73,
-    "content_hash": "338298e75cef87d42c0fb84cd43b79ea7428bd03acce8bb8bb1f80b27a725ad6"
+    "content_hash": "c134a2335214cd25b61db87dbd43e7ceade8fee3ab75df5ad51826acbe116845"
   },
   {
     "id": "experience#5",
@@ -129,7 +129,7 @@
     "content": "Nov 2017 – Oct 2021 · Mumbai, India\n\nMihir led a team of four maintaining Edgepark.com, a high-traffic B2C medical-supply e-commerce platform built with Java Spring MVC and Hibernate. He deployed 13 B2B e-commerce platforms for Saint-Gobain Abrasives using SAP Commerce Cloud (Hybris), and built REST integrations for payments, inventory management, and third-party logistics.",
     "embed_text": "[Mihir Trivedi — Professional Experience > Tata Consultancy Services — Lead Software Engineer]\nNov 2017 – Oct 2021 · Mumbai, India\n\nMihir led a team of four maintaining Edgepark.com, a high-traffic B2C medical-supply e-commerce platform built with Java Spring MVC and Hibernate. He deployed 13 B2B e-commerce platforms for Saint-Gobain Abrasives using SAP Commerce Cloud (Hybris), and built REST integrations for payments, inventory management, and third-party logistics.",
     "token_count": 94,
-    "content_hash": "c8a8f01ce8da6f40049df33794f1b902904c81f253c547a5d16e6b28ac2e2f61"
+    "content_hash": "79addf2b73b29989e280a658dca1e52d5615f8c3d09629d8fa035a67cfb6ffa6"
   },
   {
     "id": "projects#0",
@@ -140,7 +140,7 @@
     "content": "At Flosonics Medical, Mihir built a PostgreSQL and dbt Enterprise Data Warehouse that centralized sales, production, and HR data. He paired it with a Generative AI assistant using OpenAI and Gemini APIs so stakeholders could query data in plain English.",
     "embed_text": "[Mihir Trivedi — Projects and Professional Impact > Enterprise Data Warehouse and AI Data Assistant]\nAt Flosonics Medical, Mihir built a PostgreSQL and dbt Enterprise Data Warehouse that centralized sales, production, and HR data. He paired it with a Generative AI assistant using OpenAI and Gemini APIs so stakeholders could query data in plain English.",
     "token_count": 64,
-    "content_hash": "e81e0df555a878c0aa6bb51dfdf6f48f93b2b6fb9743406ac22f6078b8c2cb84"
+    "content_hash": "0e9281751476c655a8b2c917de6fdf1937d557db0aaf836e6b4a6ebec85fbc6d"
   },
   {
     "id": "projects#1",
@@ -151,7 +151,7 @@
     "content": "For LoopX and its Cementation partnership, Mihir delivered real-time dashboards for underground mining safety operations. The work covered backend, frontend, and production deployment.",
     "embed_text": "[Mihir Trivedi — Projects and Professional Impact > Mining Safety Dashboards]\nFor LoopX and its Cementation partnership, Mihir delivered real-time dashboards for underground mining safety operations. The work covered backend, frontend, and production deployment.",
     "token_count": 46,
-    "content_hash": "a07b3a0441ec5c62ea6c557db172cd3758fcd9bec58ec0d63cf0d8a7f28ff861"
+    "content_hash": "b841fc46c0f377a3f2a3f9edd31cbf6374fdb4033b96bab851198491ad0d82fc"
   },
   {
     "id": "projects#2",
@@ -162,7 +162,7 @@
     "content": "At Minax, Mihir led an offline-first Microsoft Power Platform mobile application for Vale ground-control workflows. He also automated Workplace Safety North forms with Power Automate, taking reporting from approximately five hours to minutes.",
     "embed_text": "[Mihir Trivedi — Projects and Professional Impact > Offline-First Ground-Control Application]\nAt Minax, Mihir led an offline-first Microsoft Power Platform mobile application for Vale ground-control workflows. He also automated Workplace Safety North forms with Power Automate, taking reporting from approximately five hours to minutes.",
     "token_count": 61,
-    "content_hash": "befd4ea3edfd8274e98ad6e98c6533243fcd25ca6890cc793ee567f37b94600e"
+    "content_hash": "5f53e6acdce0bc0f540307b0fbc43aead0552fa09a6e091611e89f6215953482"
   },
   {
     "id": "projects#3",
@@ -173,7 +173,7 @@
     "content": "At MERC, Mihir applied machine learning and spatial analysis to geological data for mineral discovery. The project produced gold prospectivity maps with a 99.5% F1 score and informed a 2023 Ore Geology Reviews co-authored publication.",
     "embed_text": "[Mihir Trivedi — Projects and Professional Impact > Geological Machine Learning Research]\nAt MERC, Mihir applied machine learning and spatial analysis to geological data for mineral discovery. The project produced gold prospectivity maps with a 99.5% F1 score and informed a 2023 Ore Geology Reviews co-authored publication.",
     "token_count": 59,
-    "content_hash": "c8d3a4fe185661fdc8bd3f75360d114041d6d63bcc91699bb983cc2e40d88f85"
+    "content_hash": "3460280a2c689aaa9d145cbbeef64fc1899f00de3efe39f0ac11ef639ca62391"
   },
   {
     "id": "projects#4",
@@ -184,7 +184,7 @@
     "content": "At TCS, Mihir maintained the Edgepark medical-supply e-commerce platform and deployed 13 Saint-Gobain Abrasives B2B e-commerce platforms across Europe and North America. The stack included Java Spring MVC, Hibernate, SAP Commerce Cloud, and REST integrations.",
     "embed_text": "[Mihir Trivedi — Projects and Professional Impact > Enterprise E-commerce Delivery]\nAt TCS, Mihir maintained the Edgepark medical-supply e-commerce platform and deployed 13 Saint-Gobain Abrasives B2B e-commerce platforms across Europe and North America. The stack included Java Spring MVC, Hibernate, SAP Commerce Cloud, and REST integrations.",
     "token_count": 65,
-    "content_hash": "dbb6bdb7eff168245e85421fd499d59f5b5fb16930cfc3fa178aafac52b1aaad"
+    "content_hash": "6877c0220635097f5bc6d85466bfdf018ab76f4b00ec3cdf3b73ae8651cc0ff8"
   },
   {
     "id": "skills#0",
@@ -195,7 +195,7 @@
     "content": "Mihir works with Python, PostgreSQL, dbt, SQL Server, T-SQL, SSIS, ETL/ELT, data warehousing, Power BI, Tableau, Salesforce, HubSpot, and ArcGIS. His work emphasizes centralized data platforms, reliable pipelines, and decision-ready dashboards.",
     "embed_text": "[Mihir Trivedi — Skills and Availability > Data Engineering and Business Intelligence]\nMihir works with Python, PostgreSQL, dbt, SQL Server, T-SQL, SSIS, ETL/ELT, data warehousing, Power BI, Tableau, Salesforce, HubSpot, and ArcGIS. His work emphasizes centralized data platforms, reliable pipelines, and decision-ready dashboards.",
     "token_count": 61,
-    "content_hash": "7c1e8d4c3bdddfbb9697c4272501cc3562c7e23f97c077d7182c9b034d3171bf"
+    "content_hash": "81746fb2ec19824bd3d48ac1de26b5070428c9c72f1ba80c245b23d54a5d6173"
   },
   {
     "id": "skills#1",
@@ -206,7 +206,7 @@
     "content": "Mihir has experience integrating OpenAI and Gemini APIs into data products. He works across Azure, AWS, GCP, and Cloudflare Workers, including Generative AI assistants for plain-English data access.",
     "embed_text": "[Mihir Trivedi — Skills and Availability > AI and Cloud]\nMihir has experience integrating OpenAI and Gemini APIs into data products. He works across Azure, AWS, GCP, and Cloudflare Workers, including Generative AI assistants for plain-English data access.",
     "token_count": 50,
-    "content_hash": "a27643fff9dcbe39ca6974b1bf599005141e2b9c7d6257b4eb33288d23fe7d76"
+    "content_hash": "9d319c88ee42d87534bd58a87c35848f969d424306e7be6df9c0b14e2d7d2ed7"
   },
   {
     "id": "skills#2",
@@ -217,7 +217,7 @@
     "content": "Mihir has full-stack experience with Java Spring MVC, Hibernate, SAP Commerce Cloud (Hybris), TypeScript, React Native, REST APIs, Microsoft Power Platform, Power Apps, and Power Automate.",
     "embed_text": "[Mihir Trivedi — Skills and Availability > Application Development]\nMihir has full-stack experience with Java Spring MVC, Hibernate, SAP Commerce Cloud (Hybris), TypeScript, React Native, REST APIs, Microsoft Power Platform, Power Apps, and Power Automate.",
     "token_count": 47,
-    "content_hash": "a702184d55809c2176eb4ce785a13804023ded18903d942684b8dd70435dbc29"
+    "content_hash": "4a8005ce63d4f31e08216dff60a95c81fb8dcef01be29587103255ea92be55a8"
   },
   {
     "id": "skills#3",
@@ -228,6 +228,6 @@
     "content": "Mihir is actively interviewing and available immediately. He is open to remote roles across Canada or relocation within Canada, especially Business Intelligence Developer, Data Engineer, Software Developer, or Business Analyst roles that use data, AI, and analytics.",
     "embed_text": "[Mihir Trivedi — Skills and Availability > Availability and Target Roles]\nMihir is actively interviewing and available immediately. He is open to remote roles across Canada or relocation within Canada, especially Business Intelligence Developer, Data Engineer, Software Developer, or Business Analyst roles that use data, AI, and analytics.",
     "token_count": 67,
-    "content_hash": "c03dc8c0065bcf5a109a408a2e2afabeae96881b422fccc64513fd9bba6adefb"
+    "content_hash": "8a38710ef27d9dd5368d1de1c0c06440dad2aa08305399f6f45ef932fda954c7"
   }
 ]
