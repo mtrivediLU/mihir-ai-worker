@@ -1,0 +1,34 @@
+flowchart TD
+    REQ["Incoming request"]
+
+    L1["Layer 1 — Platform TLS<br/>Cloudflare terminates HTTPS"]
+    L2["Layer 2 — CORS<br/>src/cors.ts: only mihirtrivedi.tech<br/>(+ localhost in non-production)"]
+    L3["Layer 3 — Input validation<br/>routes/*.ts: type/length checks on JSON body"]
+    L4["Layer 4 — Session lookup<br/>getSession() must return a non-ended row"]
+    L5["Layer 5 — CSRF verification<br/>verifyHmac constant-time compare"]
+    L6["Layer 6 — Rate limiting<br/>KV time-bucketed counters, fail-open"]
+    L7["Layer 7 — Turnstile bot check<br/>required once session has 5+ messages"]
+    L8["Layer 8 — Prompt-injection filter<br/>INJECTION_PATTERNS regex, pre-AI"]
+    L9["Layer 9 — Retrieved-context framing<br/>SYSTEM_PROMPT_RAG treats chunks as data, not instructions"]
+    L10["Layer 10 — Citation-ID validation<br/>strip + log any ID outside retrieved set"]
+    L11["Layer 11 — Groundedness logging<br/>assessGrounding, observability only"]
+    L12["Layer 12 — Privacy at rest<br/>hashIp() SHA-256, secrets via wrangler secret"]
+
+    OK["Request proceeds to AI generation / D1 write"]
+    BLOCK["Blocked: 401 / 403 / 429 / safe refusal"]
+
+    REQ --> L1 --> L2
+    L2 -->|origin not allowed| BLOCK
+    L2 --> L3
+    L3 -->|malformed| BLOCK
+    L3 --> L4
+    L4 -->|invalid/ended| BLOCK
+    L4 --> L5
+    L5 -->|mismatch| BLOCK
+    L5 --> L6
+    L6 -->|over limit| BLOCK
+    L6 --> L7
+    L7 -->|failed/missing| BLOCK
+    L7 --> L8
+    L8 -->|matched pattern| BLOCK
+    L8 --> L9 --> L10 --> L11 --> L12 --> OK

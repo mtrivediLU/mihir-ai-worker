@@ -1,0 +1,15 @@
+flowchart LR
+    DEV["Developer machine<br/>npm run typecheck / npm test / npm run eval"]
+    BRANCH["Git feature branch"]
+    PR["Pull request<br/>github.com/mtrivediLU/mihir-ai-worker"]
+    MAIN["main branch"]
+    IDX["npm run chunk + npm run index<br/>(manual, needs CF_ACCOUNT_ID/CF_API_TOKEN)<br/>writes data/seed.sql"]
+    SEEDCMD["wrangler d1 execute mihir_ai --remote<br/>--file data/seed.sql"]
+    WRANGLER["wrangler deploy<br/>(manual, no CI/CD configured)"]
+    WORKER["Cloudflare Worker<br/>mihir-ai-worker.mtrivedi.workers.dev"]
+    BIND["Bindings: DB (D1), RL (KV), AI (Workers AI)<br/>Secrets: SESSION_HMAC_KEY, IP_HASH_SALT,<br/>TURNSTILE_SECRET_KEY, RESEND_API_KEY, ..."]
+
+    DEV --> BRANCH --> PR -->|manual review, no merge in this task| MAIN
+    MAIN -.->|content changed| IDX --> SEEDCMD --> WORKER
+    MAIN -->|manual command| WRANGLER --> WORKER
+    WORKER --> BIND

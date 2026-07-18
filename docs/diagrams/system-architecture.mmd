@@ -1,0 +1,40 @@
+flowchart TB
+    User["Browser / User"]
+
+    subgraph FE["Portfolio_001 (GitHub Pages, static)"]
+        UI["Chatbot widget<br/>chat/chat.js + chat.css"]
+        CFG["chat/chat.config.js<br/>apiBaseUrl, turnstileSiteKey"]
+    end
+
+    subgraph EDGE["Cloudflare Workers Edge — mihir-ai-worker"]
+        ENTRY["src/index.ts<br/>CORS wrapper"]
+        ROUTER["src/router.ts"]
+        SEC["Security layer<br/>CSRF · rate limit · Turnstile · injection filter"]
+        CHAT["src/routes/chat.ts"]
+        RAG["src/retrieval.ts<br/>vector + FTS5 + RRF + rerank"]
+        AI_LIB["src/lib/ai.ts<br/>getAiReply"]
+    end
+
+    KV[("Cloudflare KV<br/>rate-limit counters")]
+    D1APP[("D1 — application tables<br/>sessions, messages, leads")]
+    D1RAG[("D1 — RAG tables<br/>chunks, chunks_fts")]
+    WAI["Cloudflare Workers AI<br/>Llama 3.1 8B + BGE embeddings"]
+    RESEND["Resend<br/>lead notification email"]
+
+    User -->|HTTPS| UI
+    UI --> CFG
+    UI -->|"POST /api/session, /api/chat, /api/lead"| ENTRY
+    ENTRY --> ROUTER
+    ROUTER --> SEC
+    SEC --> CHAT
+    CHAT <--> KV
+    CHAT <--> D1APP
+    CHAT --> RAG
+    RAG <--> D1RAG
+    RAG -->|embed query, rerank| WAI
+    CHAT -->|generate answer| AI_LIB
+    AI_LIB --> WAI
+    ROUTER -->|"POST /api/lead"| RESEND
+    CHAT -->|JSON response| ENTRY
+    ENTRY -->|"reply, answer, citations, retrieved"| UI
+    UI --> User
