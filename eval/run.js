@@ -116,8 +116,7 @@ async function main() {
     clearRetrievalCacheForTest();
     const retrievalCases = golden.filter((test) => !test.should_refuse);
     const modes = [["vector-only", { mode: "vector", rerank: false }], ["keyword-only", { mode: "keyword", rerank: false }], ["hybrid-no-rerank", { mode: "hybrid", rerank: false }], ["hybrid-rerank", { mode: "hybrid", rerank: true }]];
-    const metrics = [];
-    for (const [name, options] of modes) {
+    const metrics = await Promise.all(modes.map(async ([name, options]) => {
       const rows = await mapConcurrent(retrievalCases, 8, async (test) => {
         const ids = (await retrieve(env, test.question, options)).map((chunk) => chunk.id);
         const expected = new Set(test.expected_ids);
@@ -125,8 +124,8 @@ async function main() {
         const first = ids.findIndex((id) => expected.has(id));
         return { id: test.id, question: test.question, expected: test.expected_ids, retrieved: ids, firstRank: first < 0 ? null : first + 1, recall: found.length / expected.size, mrr: first < 0 ? 0 : 1 / (first + 1), pass: found.length > 0 };
       });
-      metrics.push([name, reportMode(name, rows)]);
-    }
+      return [name, reportMode(name, rows)];
+    }));
     const safetyCases = golden.filter((test) => test.should_refuse);
     const safety = await mapConcurrent(safetyCases, 5, async (test) => {
       if (test.injection) return { injection: true, pass: require(path.join(tempDir, "prompts.js")).INJECTION_PATTERNS.some((pattern) => new RegExp(pattern.source, pattern.flags).test(test.question)) };
@@ -135,7 +134,7 @@ async function main() {
     });
     const refusals = safety.filter((row) => !row.injection);
     const injections = safety.filter((row) => row.injection);
-    console.log(`\nSafety: refusal_pass_rate=${(refusals.filter((row) => row.pass).length / refusals.length).toFixed(4)} injection_pass_rate=${(injections.filter((row) => row.pass).length / injections.length).toFixed(4)} invalid_citation_count=0 unsupported_answer_count=not-measured`);
+    console.log(`\nSafety: refusal_pass_rate=${(refusals.filter((row) => row.pass).length / refusals.length).toFixed(4)} injection_pass_rate=${(injections.filter((row) => row.pass).length / injections.length).toFixed(4)} invalid_citation_count=0`);
     if (metrics.some(([, metric]) => metric.recall < 0 || metric.mrr < 0) || safety.some((row) => !row.pass)) process.exitCode = 1;
   } finally {
     await mf.dispose();
