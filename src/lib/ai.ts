@@ -30,7 +30,7 @@ export async function getAiReply(
   history: Message[],
   ragContext?: string,
 ): Promise<AiResult> {
-  const systemContent = ragContext
+  const systemContent = ragContext !== undefined
     ? SYSTEM_PROMPT_RAG(ragContext)
     : SYSTEM_PROMPT_CHAT(PROFILE_TEXT, PROFILE.availability);
 
