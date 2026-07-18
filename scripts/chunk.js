@@ -88,9 +88,13 @@ function hashContent(content) {
 function buildChunks(contentDir = CONTENT_DIR) {
   const chunks = [];
   const files = fs.readdirSync(contentDir).filter((file) => file.endsWith(".md")).sort();
+  const docIds = new Set();
   for (const file of files) {
     const filename = path.join(contentDir, file);
     const { frontmatter, body } = parseFrontmatter(fs.readFileSync(filename, "utf8"), file);
+    if (docIds.has(frontmatter.doc_id)) throw new Error(`${file}: duplicate doc_id ${frontmatter.doc_id}`);
+    docIds.add(frontmatter.doc_id);
+    if (/\bTODO\b|lorem ipsum/i.test(body)) throw new Error(`${file}: contains placeholder text`);
     let chunkIndex = 0;
     for (const section of splitSections(body, file)) {
       for (const content of splitLongSection(section.content, file, section.heading)) {
@@ -104,7 +108,9 @@ function buildChunks(contentDir = CONTENT_DIR) {
           content,
           embed_text,
           token_count: tokenCount(content),
-          content_hash: hashContent(content),
+          // This deliberately hashes the complete embedding input. Changing a
+          // title or heading must invalidate its cached embedding.
+          content_hash: hashContent(embed_text),
         });
         chunkIndex += 1;
       }
@@ -113,8 +119,32 @@ function buildChunks(contentDir = CONTENT_DIR) {
   return chunks;
 }
 
+function chunkStats(chunks) {
+  const sizes = chunks.map((chunk) => chunk.token_count);
+  const histogram = { "0-99": 0, "100-199": 0, "200-299": 0, "300-400": 0, "401+": 0 };
+  for (const size of sizes) {
+    if (size < 100) histogram["0-99"] += 1;
+    else if (size < 200) histogram["100-199"] += 1;
+    else if (size < 300) histogram["200-299"] += 1;
+    else if (size <= 400) histogram["300-400"] += 1;
+    else histogram["401+"] += 1;
+  }
+  return {
+    documents: new Set(chunks.map((chunk) => chunk.doc_id)).size,
+    chunks: chunks.length,
+    min_tokens: Math.min(...sizes),
+    max_tokens: Math.max(...sizes),
+    average_tokens: Number((sizes.reduce((sum, size) => sum + size, 0) / sizes.length).toFixed(1)),
+    histogram,
+  };
+}
+
 function main() {
   const chunks = buildChunks();
+  if (process.argv.includes("--dry-run")) {
+    console.log(JSON.stringify(chunkStats(chunks), null, 2));
+    return;
+  }
   fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
   fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(chunks, null, 2)}\n`);
   console.log(`Wrote ${chunks.length} chunks to ${path.relative(ROOT, OUTPUT_PATH)}`);
@@ -122,4 +152,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildChunks, parseFrontmatter, splitLongSection };
+module.exports = { buildChunks, chunkStats, parseFrontmatter, splitLongSection };

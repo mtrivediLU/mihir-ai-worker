@@ -6,6 +6,7 @@
     "chunk": "node scripts/chunk.js",
     "index": "node scripts/index.js",
     "eval": "node eval/run.js",
+    "test": "node --test tests/*.test.js",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
