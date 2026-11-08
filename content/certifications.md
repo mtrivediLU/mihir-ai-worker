@@ -1,17 +1,21 @@
 ---
 doc_id: certifications
 source: portfolio-profile
-title: Mihir Trivedi — Certifications
+title: Mihir Trivedi — Credentials and Training
 ---
 
-## Microsoft Azure Certifications
+## Microsoft Azure
 
-Mihir holds AZ-305: Designing Azure Infrastructure Solutions (2024) and Azure Fundamentals, AZ-900 (2024; credential ID C669A77F8F67FB6D).
+Mihir earned Azure Fundamentals (AZ-900) and passed the AZ-305 exam, Designing Microsoft Azure Infrastructure Solutions. An AZ-305 exam pass alone is not the Azure Solutions Architect Expert certification.
 
-## Data and Power Platform Certifications
+## Power BI and Power Platform
 
-Mihir holds Power BI Data Analyst Associate, PL-300 (2024; credential ID 982D4E48445B5F5D) and Power Platform Developer Associate, PL-400 (2024; credential ID E94F1B4F03BC2E34).
+Mihir earned the Power BI Data Analyst Associate (PL-300) and Power Platform Developer Associate (PL-400) credentials. The supplied certificate images are historical records; current certification status must be checked on Microsoft Learn. Do not claim they are currently active.
 
-## Salesforce Certification
+## Salesforce
 
-Mihir holds the Salesforce Certified Agentforce Specialist, AI-201 (2025; credential ID 7292670).
+Mihir earned the Salesforce Agentforce Specialist credential. Refer to the issuer for current status.
+
+## The Fundamentals of OCAP®
+
+Mihir completed The Fundamentals of OCAP® course from the First Nations Information Governance Centre (FNIGC) in 2026. It covers ownership, control, access and possession of First Nations data. This is course completion, not professional certification or authority to speak for a community. OCAP® is a registered trademark of FNIGC.

@@ -1,41 +1,33 @@
 ---
 doc_id: experience
 source: portfolio-profile
-title: Mihir Trivedi — Professional Experience
+title: Mihir Trivedi — Public Professional Background
 ---
 
-## Flosonics Medical — Business Intelligence Developer
+## Background and contact
 
-Oct 2024 – Apr 2026 · Toronto, ON (Remote)
+Toronto-based technology professional with industry experience since 2017. His work spans business intelligence, analytics engineering, data systems, applied AI and automation, research and public speaking. This experience includes employed and contract roles; it is not a claim of independent consulting tenure. Reach Mihir at mtrivedi@laurentian.ca. Current availability, employment dates, compensation, immigration details and client identities are not published.
 
-Mihir architected an Enterprise Data Warehouse with PostgreSQL and dbt, unifying sales, production, and HR data. He engineered a Generative AI assistant using OpenAI and Gemini APIs for plain-English queries across data sources. He also built ELT pipelines for Salesforce, HubSpot, ZoomInfo, and device logs and automated Tableau reporting.
+## Data engineering and BI
 
-## LoopX — Software Development Consultant
+Context: A medical device organization. Built a PostgreSQL and dbt warehouse, ELT pipelines and reporting with Python, SQL, Tableau and Power BI. Also worked on a plain-language data assistant.
 
-Jun 2024 – Jul 2025 · Sudbury, ON
+## Operational analytics
 
-Mihir built real-time safety dashboards for underground mining operations in partnership with Cementation. He owned end-to-end delivery across backend, frontend, and production deployment.
+Context: Mining technology. Built and deployed dashboards and automated operational reporting using Python, JavaScript and PostgreSQL.
 
-## City of Greater Sudbury — Business Intelligence Analyst
+## Municipal reporting
 
-May 2024 – Aug 2024 · Sudbury, ON
+Context: An Ontario municipality. Integrated vendor data with SQL Server using SSIS, Python and Cloud SQL Auth Proxy, and developed Power BI reporting.
 
-Mihir integrated a third-party vendor with SQL Server using SSIS, Python, and Google Cloud SQL Auth Proxy. He supported 911 and opioid-response reporting and built Service-Based Budgeting dashboards in Power BI.
+## Field automation
 
-## Minax Inc. — Lead Software Developer
+Context: Mining services. Led delivery of an offline-first Power Apps inspection workflow using Dataverse and Power Automate, including requirements, testing, documentation and handover.
 
-Oct 2023 – May 2024 · Sudbury, ON
+## Research
 
-Mihir led delivery of an offline-first mobile ground-control application for Vale using Microsoft Power Platform. He automated Workplace Safety North forms with Power Automate, reducing reporting from about five hours to minutes.
+Context: Laurentian University. Applied random forest models and spatial analysis to regional geological data, contributing to published research.
 
-## MERC — Research Associate (Data & ML)
+## Software engineering
 
-Mar 2022 – Jul 2023 · Sudbury, ON
-
-At Laurentian University's Mineral Exploration Research Centre, Mihir applied machine learning to geological datasets and produced gold prospectivity maps with a 99.5% F1 score. His spatial analysis used ArcGIS and QGIS to assess mineralization probability.
-
-## Tata Consultancy Services — Lead Software Engineer
-
-Nov 2017 – Oct 2021 · Mumbai, India
-
-Mihir led a team of four maintaining Edgepark.com, a high-traffic B2C medical-supply e-commerce platform built with Java Spring MVC and Hibernate. He deployed 13 B2B e-commerce platforms for Saint-Gobain Abrasives using SAP Commerce Cloud (Hybris), and built REST integrations for payments, inventory management, and third-party logistics.
+Context: Enterprise e-commerce. Built Java services and REST integrations for enterprise e-commerce platforms across Europe and North America.

@@ -13,8 +13,8 @@ test("corpus chunks are deterministic and hash the complete embedding input", ()
     assert.equal(chunk.content_hash, createHash("sha256").update(chunk.embed_text).digest("hex"));
   }
   assert.deepEqual(chunkStats(first), {
-    documents: 5, chunks: 21, min_tokens: 14, max_tokens: 96, average_tokens: 58.6,
-    histogram: { "0-99": 21, "100-199": 0, "200-299": 0, "300-400": 0, "401+": 0 },
+    documents: 5, chunks: 25, min_tokens: 14, max_tokens: 117, average_tokens: 51.1,
+    histogram: { "0-99": 23, "100-199": 2, "200-299": 0, "300-400": 0, "401+": 0 },
   });
 });
 

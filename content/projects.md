@@ -1,25 +1,33 @@
 ---
 doc_id: projects
 source: portfolio-profile
-title: Mihir Trivedi — Projects and Professional Impact
+title: Mihir Trivedi — Public Projects
 ---
 
-## Enterprise Data Warehouse and AI Data Assistant
+## Data engineering and BI
 
-At Flosonics Medical, Mihir built a PostgreSQL and dbt Enterprise Data Warehouse that centralized sales, production, and HR data. He paired it with a Generative AI assistant using OpenAI and Gemini APIs so stakeholders could query data in plain English.
+Built a PostgreSQL and dbt warehouse, ELT pipelines and reporting with Python, SQL, Tableau and Power BI. Also worked on a plain-language data assistant.
 
-## Mining Safety Dashboards
+## Operational analytics
 
-For LoopX and its Cementation partnership, Mihir delivered real-time dashboards for underground mining safety operations. The work covered backend, frontend, and production deployment.
+Built and deployed dashboards and automated operational reporting using Python, JavaScript and PostgreSQL.
 
-## Offline-First Ground-Control Application
+## Municipal reporting
 
-At Minax, Mihir led an offline-first Microsoft Power Platform mobile application for Vale ground-control workflows. He also automated Workplace Safety North forms with Power Automate, taking reporting from approximately five hours to minutes.
+Integrated vendor data with SQL Server using SSIS, Python and Cloud SQL Auth Proxy, and developed Power BI reporting.
 
-## Geological Machine Learning Research
+## Field automation
 
-At MERC, Mihir applied machine learning and spatial analysis to geological data for mineral discovery. The project produced gold prospectivity maps with a 99.5% F1 score and informed a 2023 Ore Geology Reviews co-authored publication.
+Led delivery of an offline-first Power Apps inspection workflow using Dataverse and Power Automate, including requirements, testing, documentation and handover.
 
-## Enterprise E-commerce Delivery
+## Research
 
-At TCS, Mihir maintained the Edgepark medical-supply e-commerce platform and deployed 13 Saint-Gobain Abrasives B2B e-commerce platforms across Europe and North America. The stack included Java Spring MVC, Hibernate, SAP Commerce Cloud, and REST integrations.
+Applied random forest models and spatial analysis to regional geological data, contributing to published research.
+
+## Software engineering
+
+Built Java services and REST integrations for enterprise e-commerce platforms across Europe and North America.
+
+## Mihir AI
+
+Mihir built a static JavaScript chatbot widget and a Cloudflare Worker API with anonymous sessions, CSRF protection, rate limiting, Turnstile verification and lead capture. The documented hybrid RAG implementation combines vector retrieval and FTS5 BM25 using reciprocal rank fusion, optional reranking, and citation validation. Deployment configuration controls which response path is active; do not infer the active mode from the design write-up.
